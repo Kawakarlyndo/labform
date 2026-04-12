@@ -16,6 +16,8 @@
     --verde-claro:#E3F5E1;
     --amarelo:    #FFCD07;
     --amarelo-bg: #FFF8DC;
+    --laranja:    #E37222;
+    --laranja-bg: #FFF3E8;
     --branco:     #FFFFFF;
     --cinza1:     #F8F8F8;
     --cinza2:     #EDEDED;
@@ -28,281 +30,196 @@
     --shadow:     0 2px 8px rgba(0,0,0,0.10);
     --shadow-md:  0 4px 16px rgba(0,0,0,0.14);
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
-    background: var(--cinza1);
-    color: var(--texto);
-    min-height: 100vh;
-  }
-
-  .gov-top {
-    background: var(--azul-esc);
-    padding: 8px 0;
-    border-bottom: 3px solid var(--amarelo);
-  }
-  .gov-top-inner {
-    max-width: 960px; margin: 0 auto; padding: 0 20px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .brasao {
-    width: 38px; height: 38px; background: var(--amarelo);
-    border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 16px; font-weight: 700;
-    color: var(--azul-esc); flex-shrink: 0;
-  }
+  body { font-family: 'Source Sans 3','Segoe UI',sans-serif; background: var(--cinza1); color: var(--texto); min-height: 100vh; }
+ 
+  /* ── GOV HEADER ── */
+  .gov-top { background: var(--azul-esc); padding: 8px 0; border-bottom: 3px solid var(--amarelo); }
+  .gov-top-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; gap: 12px; }
+  .brasao { width: 38px; height: 38px; background: var(--amarelo); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--azul-esc); flex-shrink: 0; }
   .gov-top-text .org  { font-size: 11px; color: rgba(255,255,255,.7); letter-spacing: .5px; }
   .gov-top-text .nome { font-size: 14px; font-weight: 600; color: #fff; }
-
+ 
   .gov-bar { background: var(--azul); padding: 22px 0 0; }
   .gov-bar-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; }
-  .gov-bar h1 {
-    font-size: clamp(18px, 3vw, 26px); font-weight: 700; color: #fff; margin-bottom: 4px;
-  }
-  .gov-bar p { font-size: 14px; color: rgba(255,255,255,.8); margin-bottom: 16px; }
-  .breadcrumb {
-    display: inline-flex; gap: 6px; align-items: center;
-    background: rgba(0,0,0,.18); padding: 7px 16px;
-    border-radius: 4px 4px 0 0; font-size: 12px; color: rgba(255,255,255,.7);
-  }
+  .gov-bar h1 { font-size: clamp(17px,3vw,24px); font-weight: 700; color: #fff; margin-bottom: 2px; }
+  .gov-bar .escola { font-size: 12px; color: rgba(255,255,255,.65); margin-bottom: 4px; letter-spacing: .3px; }
+  .gov-bar p  { font-size: 14px; color: rgba(255,255,255,.8); margin-bottom: 16px; }
+  .breadcrumb { display: inline-flex; gap: 6px; align-items: center; background: rgba(0,0,0,.18); padding: 7px 16px; border-radius: 4px 4px 0 0; font-size: 12px; color: rgba(255,255,255,.7); }
   .breadcrumb span { color: var(--amarelo); font-weight: 600; }
-
-  .main { max-width: 960px; margin: 0 auto; padding: 28px 20px 60px; }
-
-  .card {
-    background: var(--branco);
-    border: 1px solid var(--cinza2);
-    border-top: 3px solid var(--azul);
-    border-radius: 4px;
-    padding: 28px;
-    box-shadow: var(--shadow);
-  }
-  .card-title {
-    font-size: 15px; font-weight: 700; color: var(--azul-esc);
-    margin-bottom: 20px; padding-bottom: 12px;
-    border-bottom: 1px solid var(--cinza2);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .card-title::before {
-    content: ''; width: 4px; height: 20px;
-    background: var(--azul); border-radius: 2px; display: inline-block;
-  }
-
-  .cal-nav {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px; background: var(--azul-bg);
-    border: 1px solid var(--azul-claro); border-radius: 4px; padding: 10px 16px;
-  }
+ 
+  .main { max-width: 960px; margin: 0 auto; padding: 28px 20px 60px; display: flex; flex-direction: column; gap: 20px; }
+ 
+  /* ── CARD ── */
+  .card { background: var(--branco); border: 1px solid var(--cinza2); border-top: 3px solid var(--azul); border-radius: 4px; padding: 28px; box-shadow: var(--shadow); }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--azul-esc); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--cinza2); display: flex; align-items: center; gap: 10px; }
+  .card-title::before { content: ''; width: 4px; height: 20px; background: var(--azul); border-radius: 2px; display: inline-block; }
+ 
+  /* ── CARD ATENDIMENTO ── */
+  .card-atend { background: var(--branco); border: 1px solid var(--cinza2); border-top: 3px solid var(--laranja); border-radius: 4px; padding: 24px 28px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .atend-texto h3 { font-size: 15px; font-weight: 700; color: var(--laranja); margin-bottom: 4px; }
+  .atend-texto p  { font-size: 13px; color: var(--cinza5); }
+  .btn-atend { padding: 10px 22px; border-radius: 4px; background: var(--laranja); border: none; color: #fff; font-family: 'Source Sans 3',sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s; white-space: nowrap; }
+  .btn-atend:hover { background: #c0601a; }
+ 
+  /* ── CAL ── */
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: var(--azul-bg); border: 1px solid var(--azul-claro); border-radius: 4px; padding: 10px 16px; }
   .cal-title { font-size: 15px; font-weight: 700; color: var(--azul-esc); }
-  .nav-btn {
-    width: 32px; height: 32px; border-radius: 4px;
-    background: var(--azul); border: none; color: #fff;
-    font-size: 20px; cursor: pointer; display: flex;
-    align-items: center; justify-content: center; transition: background .15s;
-  }
+  .nav-btn { width: 32px; height: 32px; border-radius: 4px; background: var(--azul); border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; }
   .nav-btn:hover { background: var(--azul-esc); }
-
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .day-hdr {
-    text-align: center; font-size: 11px; font-weight: 700;
-    color: var(--azul); padding: 6px 0; letter-spacing: 1px; text-transform: uppercase;
-  }
-  .day {
-    aspect-ratio: 1; border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    border: 1px solid var(--cinza2); transition: all .15s;
-    position: relative; color: var(--texto); background: var(--branco);
-  }
-  .day:hover:not(.empty):not(.past):not(.ocupado) {
-    background: var(--azul); border-color: var(--azul); color: #fff;
-  }
-  .day.today {
-    background: var(--azul-bg); border-color: var(--azul); color: var(--azul); font-weight: 700;
-  }
-  .day.today::after {
-    content: ''; position: absolute; bottom: 3px; left: 50%;
-    transform: translateX(-50%); width: 4px; height: 4px;
-    border-radius: 50%; background: var(--azul);
-  }
-  .day.ocupado {
-    background: var(--red-bg); border-color: #ffb3b3; color: var(--red); cursor: not-allowed;
-  }
-  .day.ocupado::after {
-    content: '×'; position: absolute; bottom: 1px; right: 4px; font-size: 10px; color: var(--red);
-  }
+  .cal-loading { text-align: center; padding: 40px; color: var(--cinza4); font-size: 14px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+  .day-hdr { text-align: center; font-size: 11px; font-weight: 700; color: var(--azul); padding: 6px 0; letter-spacing: 1px; text-transform: uppercase; }
+  .day { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--cinza2); transition: all .15s; position: relative; color: var(--texto); background: var(--branco); }
+  .day:hover:not(.empty):not(.past):not(.ocupado) { background: var(--azul); border-color: var(--azul); color: #fff; }
+  .day.today { background: var(--azul-bg); border-color: var(--azul); color: var(--azul); font-weight: 700; }
+  .day.today::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--azul); }
+  .day.ocupado { background: var(--red-bg); border-color: #ffb3b3; color: var(--red); cursor: not-allowed; }
+  .day.ocupado::after { content: '×'; position: absolute; bottom: 1px; right: 4px; font-size: 10px; color: var(--red); }
   .day.past   { color: var(--cinza3); cursor: not-allowed; background: var(--cinza1); border-color: var(--cinza2); }
   .day.empty  { background: transparent; border-color: transparent; cursor: default; }
-
-  .legend {
-    display: flex; gap: 20px; margin-top: 16px;
-    padding-top: 14px; border-top: 1px solid var(--cinza2); flex-wrap: wrap;
-  }
+  .legend { display: flex; gap: 20px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--cinza2); flex-wrap: wrap; }
   .leg { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--cinza5); }
   .leg-box { width: 14px; height: 14px; border-radius: 2px; border: 1px solid; flex-shrink: 0; }
-
-  .overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,.55); z-index: 100;
-    align-items: center; justify-content: center; padding: 16px;
-  }
+ 
+  /* ── OVERLAY / MODAL ── */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 100; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
   .overlay.show { display: flex; }
-
-  .modal {
-    background: var(--branco); border-radius: 4px;
-    border-top: 4px solid var(--azul);
-    width: 100%; max-width: 540px;
-    max-height: 92vh; overflow-y: auto;
-    box-shadow: var(--shadow-md);
-    animation: mIn .2s ease;
-  }
+  .modal { background: var(--branco); border-radius: 4px; border-top: 4px solid var(--azul); width: 100%; max-width: 560px; margin: auto; box-shadow: var(--shadow-md); animation: mIn .2s ease; }
+  .modal.modal-laranja { border-top-color: var(--laranja); }
   @keyframes mIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-
-  .modal-header {
-    padding: 20px 24px 16px; border-bottom: 1px solid var(--cinza2); background: var(--azul-bg);
-  }
-  .modal-date {
-    font-size: 11px; font-weight: 700; letter-spacing: 1px;
-    color: var(--azul); text-transform: uppercase; margin-bottom: 4px;
-  }
+  .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--cinza2); background: var(--azul-bg); }
+  .modal-header.laranja { background: var(--laranja-bg); }
+  .modal-date  { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--azul); text-transform: uppercase; margin-bottom: 4px; }
   .modal-title { font-size: 17px; font-weight: 700; color: var(--azul-esc); }
-
-  .modal-body { padding: 20px 24px 24px; }
-
-  .aviso {
-    background: var(--amarelo-bg); border-left: 4px solid var(--amarelo);
-    border-radius: 0 4px 4px 0; padding: 10px 14px;
-    margin-bottom: 20px; font-size: 13px; color: #5a4800;
-  }
-
+  .modal-title.laranja { color: var(--laranja); }
+  .modal-body  { padding: 20px 24px 24px; }
+ 
+  /* ── AVISOS ── */
+  .aviso { border-left: 4px solid; border-radius: 0 4px 4px 0; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; line-height: 1.5; }
+  .aviso-amarelo { background: var(--amarelo-bg); border-color: var(--amarelo); color: #5a4800; }
+  .aviso-azul    { background: var(--azul-bg);    border-color: var(--azul);    color: #0a2a6b; }
+  .aviso b { font-weight: 700; }
+ 
+  /* ── HW SPEC BOX ── */
+  .hw-box { background: var(--cinza1); border: 1px solid var(--cinza2); border-radius: 4px; padding: 14px 16px; margin-bottom: 16px; }
+  .hw-title { font-size: 12px; font-weight: 700; color: var(--cinza5); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+  .hw-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+  .hw-spec { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--texto); }
+  .hw-spec-icon { width: 28px; height: 28px; background: var(--azul-bg); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hw-spec-icon svg { width: 14px; height: 14px; stroke: var(--azul); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .hw-spec-info .label { font-size: 10px; color: var(--cinza4); text-transform: uppercase; letter-spacing: .5px; line-height: 1; }
+  .hw-spec-info .val   { font-size: 13px; font-weight: 600; color: var(--texto); line-height: 1.3; }
+  .hw-spec-info .val.warn { color: var(--laranja); }
+ 
+  /* ── FORM ── */
   .form-section { margin-bottom: 16px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  label.fl {
-    display: block; font-size: 12px; font-weight: 700;
-    color: var(--cinza5); margin-bottom: 5px;
-    letter-spacing: .3px; text-transform: uppercase;
-  }
+  label.fl { display: block; font-size: 12px; font-weight: 700; color: var(--cinza5); margin-bottom: 5px; letter-spacing: .3px; text-transform: uppercase; }
   .req { color: var(--red); margin-left: 2px; }
-
   input[type=text], input[type=email], input[type=number], select, textarea {
-    width: 100%; padding: 9px 12px;
-    background: var(--branco); border: 1px solid var(--cinza3);
-    border-radius: 4px; color: var(--texto);
-    font-family: 'Source Sans 3', sans-serif; font-size: 14px;
-    transition: border-color .15s, box-shadow .15s;
+    width: 100%; padding: 9px 12px; background: var(--branco); border: 1px solid var(--cinza3); border-radius: 4px; color: var(--texto); font-family: 'Source Sans 3',sans-serif; font-size: 14px; transition: border-color .15s, box-shadow .15s;
   }
   input::placeholder, textarea::placeholder { color: var(--cinza4); }
-  input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--azul);
-    box-shadow: 0 0 0 3px rgba(19,81,180,.12);
-  }
-  select { cursor: pointer; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--azul); box-shadow: 0 0 0 3px rgba(19,81,180,.12); }
   textarea { resize: vertical; min-height: 80px; }
-
+  .campo-fixo { width: 100%; padding: 9px 12px; background: var(--cinza1); border: 1px solid var(--cinza2); border-radius: 4px; color: var(--cinza5); font-family: 'Source Sans 3',sans-serif; font-size: 14px; font-weight: 600; }
+ 
+  /* ── RADIO ── */
   .radio-group { display: flex; gap: 10px; }
-  .radio-opt {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 14px; font-weight: 500; cursor: pointer;
-    padding: 9px 14px; border-radius: 4px;
-    border: 1px solid var(--cinza3); background: var(--branco); color: var(--cinza5);
-    transition: all .15s; flex: 1; justify-content: center;
-  }
+  .radio-opt { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; cursor: pointer; padding: 9px 14px; border-radius: 4px; border: 1px solid var(--cinza3); background: var(--branco); color: var(--cinza5); transition: all .15s; flex: 1; justify-content: center; }
   .radio-opt input { display: none; }
   .radio-opt.sel-sim { background: var(--verde-claro); border-color: var(--verde); color: var(--verde); font-weight: 700; }
   .radio-opt.sel-nao { background: var(--azul-bg); border-color: var(--azul); color: var(--azul); font-weight: 700; }
-
   .aux-box { display: none; margin-top: 12px; }
   .aux-box.show { display: block; }
-
-  .divisor { border: none; border-top: 1px solid var(--cinza2); margin: 18px 0; }
-  .sec-label {
-    font-size: 12px; font-weight: 700; color: var(--azul);
-    text-transform: uppercase; letter-spacing: 1px;
-    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-  }
+ 
+  .divisor   { border: none; border-top: 1px solid var(--cinza2); margin: 18px 0; }
+  .sec-label { font-size: 12px; font-weight: 700; color: var(--azul); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
   .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--azul-claro); }
-
-  .btn-row {
-    display: flex; gap: 10px; margin-top: 20px;
-    padding-top: 16px; border-top: 1px solid var(--cinza2);
-  }
-  .btn-cancel {
-    padding: 10px 20px; border-radius: 4px;
-    background: var(--branco); border: 1px solid var(--cinza3);
-    color: var(--cinza5); font-family: 'Source Sans 3', sans-serif;
-    font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s;
-  }
+  .sec-label.laranja { color: var(--laranja); }
+  .sec-label.laranja::after { background: #ffd8b5; }
+ 
+  /* ── BOTÕES ── */
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--cinza2); }
+  .btn-cancel { padding: 10px 20px; border-radius: 4px; background: var(--branco); border: 1px solid var(--cinza3); color: var(--cinza5); font-family: 'Source Sans 3',sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; }
   .btn-cancel:hover { background: var(--cinza2); }
-  .btn-send {
-    flex: 1; padding: 10px 20px; border-radius: 4px;
-    background: var(--azul); border: none; color: #fff;
-    font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: background .15s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-send:hover:not(:disabled) { background: var(--azul-esc); }
-  .btn-send:disabled { opacity: .55; cursor: not-allowed; }
-
-  .spinner {
-    display: none; width: 14px; height: 14px;
-    border: 2px solid rgba(255,255,255,.35); border-top-color: #fff;
-    border-radius: 50%; animation: spin .7s linear infinite;
-  }
+  .btn-primary { flex: 1; padding: 10px 20px; border-radius: 4px; background: var(--azul); border: none; color: #fff; font-family: 'Source Sans 3',sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary:hover:not(:disabled) { background: var(--azul-esc); }
+  .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+  .btn-primary.laranja-btn { background: var(--laranja); }
+  .btn-primary.laranja-btn:hover:not(:disabled) { background: #c0601a; }
+ 
+  /* ── SPINNER ── */
+  .spinner { display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
   .spinner.show { display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .toast {
-    display: none; position: fixed;
-    bottom: 28px; left: 50%; transform: translateX(-50%);
-    z-index: 200; padding: 12px 24px; border-radius: 4px;
-    font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600;
-    white-space: nowrap; box-shadow: var(--shadow-md); border-left: 4px solid;
-  }
+ 
+  /* ── SUCESSO ── */
+  .sucesso-box { padding: 28px 24px; text-align: center; }
+  .sucesso-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .sucesso-icon.verde   { background: var(--verde-claro); }
+  .sucesso-icon.laranja { background: var(--laranja-bg); }
+  .sucesso-icon svg { width: 28px; height: 28px; }
+  .sucesso-title  { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .sucesso-data   { font-size: 14px; color: var(--cinza5); margin-bottom: 16px; }
+  .sucesso-msg    { border-radius: 4px; padding: 14px 16px; font-size: 14px; line-height: 1.6; text-align: left; margin-bottom: 20px; }
+  .sucesso-msg.azul   { background: var(--azul-bg); border: 1px solid var(--azul-claro); color: #0a2a6b; }
+  .sucesso-msg.laranja { background: var(--laranja-bg); border: 1px solid #ffd8b5; color: #7a3a00; }
+  .sucesso-msg b  { font-weight: 700; }
+  .btn-fechar { padding: 10px 32px; border-radius: 4px; border: none; color: #fff; font-family: 'Source Sans 3',sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s; }
+  .btn-fechar.azul    { background: var(--azul); }
+  .btn-fechar.azul:hover    { background: var(--azul-esc); }
+  .btn-fechar.laranja { background: var(--laranja); }
+  .btn-fechar.laranja:hover { background: #c0601a; }
+ 
+  /* ── TOAST ── */
+  .toast { display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 300; padding: 12px 24px; border-radius: 4px; font-family: 'Source Sans 3',sans-serif; font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: var(--shadow-md); border-left: 4px solid; }
   .toast.show { display: block; }
   .toast.ok  { background: var(--verde-claro); border-color: var(--verde); color: #0a5c15; }
   .toast.err { background: var(--red-bg); border-color: var(--red); color: var(--red); }
-
-  .rodape {
-    background: var(--azul-esc); color: rgba(255,255,255,.6);
-    text-align: center; font-size: 12px; padding: 16px; margin-top: 40px;
-  }
+ 
+  .rodape { background: var(--azul-esc); color: rgba(255,255,255,.6); text-align: center; font-size: 12px; padding: 16px; margin-top: 40px; }
   .rodape strong { color: rgba(255,255,255,.9); }
-
+ 
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-thumb { background: var(--cinza3); border-radius: 4px; }
-
-  @media(max-width:500px){
+ 
+  @media(max-width:520px){
     .form-row { grid-template-columns: 1fr; }
-    .card { padding: 16px; }
-    .modal-body, .modal-header { padding: 16px; }
+    .hw-specs { grid-template-columns: 1fr; }
+    .card, .modal-body, .modal-header { padding: 16px; }
     .radio-group { flex-direction: column; }
+    .card-atend { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
 <body>
-
+ 
+<!-- ── HEADER ── -->
 <div class="gov-top">
   <div class="gov-top-inner">
     <div class="brasao">BR</div>
     <div class="gov-top-text">
-      <div class="org">Secretaria Municipal de Educação</div>
-      <div class="nome">Prefeitura de Açailândia — MA</div>
+      <div class="org">Secretaria Municipal de Educação — Açailândia, MA</div>
+      <div class="nome">Escola Municipal Professor Ezequias Silva Vieira</div>
     </div>
   </div>
 </div>
-
+ 
 <div class="gov-bar">
   <div class="gov-bar-inner">
+    <div class="escola">EM Professor Ezequias Silva Vieira</div>
     <h1>Laboratório de Informática</h1>
-    <p>Agendamento de uso — Escola Municipal</p>
+    <p>Agendamento de uso do laboratório</p>
     <div class="breadcrumb">Início &rsaquo; <span>Agendamento de Laboratório</span></div>
   </div>
 </div>
-
+ 
+<!-- ── MAIN ── -->
 <div class="main">
+ 
+  <!-- Calendário -->
   <div class="card">
     <div class="card-title">Calendário de disponibilidade</div>
     <div class="cal-nav">
@@ -310,223 +227,424 @@
       <span class="cal-title" id="cal-title"></span>
       <button class="nav-btn" onclick="navMonth(1)">&#8250;</button>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
+    <div id="cal-area"><div class="cal-loading">Conectando ao banco de dados...</div></div>
     <div class="legend">
       <div class="leg"><div class="leg-box" style="background:var(--azul-bg);border-color:var(--azul)"></div>Hoje</div>
       <div class="leg"><div class="leg-box" style="background:var(--red-bg);border-color:#ffb3b3"></div>Ocupado</div>
       <div class="leg"><div class="leg-box" style="background:var(--branco);border-color:var(--cinza2)"></div>Disponível — clique para agendar</div>
     </div>
   </div>
-</div>
-
-<div class="overlay" id="overlay">
-<div class="modal">
-  <div class="modal-header">
-    <div class="modal-date" id="modal-date"></div>
-    <div class="modal-title">Formulário de Agendamento</div>
+ 
+  <!-- Botão atendimento presencial -->
+  <div class="card-atend">
+    <div class="atend-texto">
+      <h3>Não conseguiu agendar?</h3>
+      <p>Se o dia que você precisa está ocupado ou tem alguma dificuldade, solicite um atendimento presencial com o técnico de laboratório.</p>
+    </div>
+    <button class="btn-atend" onclick="abrirAtendimento()">Solicitar atendimento presencial</button>
   </div>
-  <div class="modal-body">
-
-    <div class="aviso">
-      Preencha todos os campos obrigatórios (*). Após confirmar, o dia será marcado como ocupado e você receberá um e-mail de confirmação.
+ 
+</div>
+ 
+<!-- ── MODAL AGENDAMENTO ── -->
+<div class="overlay" id="overlay-agenda">
+<div class="modal" id="modal-agenda">
+ 
+  <div id="view-form">
+    <div class="modal-header">
+      <div class="modal-date" id="modal-date"></div>
+      <div class="modal-title">Formulário de Agendamento</div>
     </div>
-
-    <div class="sec-label">Dados do solicitante</div>
-
-    <div class="form-section">
-      <label class="fl">Nome completo <span class="req">*</span></label>
-      <input type="text" id="f-nome" placeholder="Nome completo do professor ou responsável">
-    </div>
-
-    <div class="form-section">
-      <div class="form-row">
-        <div>
-          <label class="fl">Turma / Turno <span class="req">*</span></label>
-          <input type="text" id="f-turma" placeholder="Ex: 9A — Manhã">
-        </div>
-        <div>
-          <label class="fl">Qtd. de alunos <span class="req">*</span></label>
-          <input type="number" id="f-alunos" placeholder="Ex: 30" min="1" max="40">
+    <div class="modal-body">
+ 
+      <div class="aviso aviso-amarelo">
+        Preencha todos os campos obrigatórios (*). Após confirmar, o dia será bloqueado para todos os usuários em tempo real.
+      </div>
+ 
+      <div class="sec-label">Dados do solicitante</div>
+ 
+      <div class="form-section">
+        <label class="fl">Nome completo <span class="req">*</span></label>
+        <input type="text" id="f-nome" placeholder="Nome completo do professor ou responsável">
+      </div>
+      <div class="form-section">
+        <div class="form-row">
+          <div>
+            <label class="fl">Turma / Turno <span class="req">*</span></label>
+            <input type="text" id="f-turma" placeholder="Ex: 9A — Manhã">
+          </div>
+          <div>
+            <label class="fl">Qtd. de alunos <span class="req">*</span></label>
+            <input type="number" id="f-alunos" placeholder="Ex: 30" min="1" max="40">
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="form-section">
-      <label class="fl">E-mail para confirmação <span class="req">*</span></label>
-      <input type="email" id="f-email" placeholder="seu@email.com">
-    </div>
-
-    <hr class="divisor">
-    <div class="sec-label">Dados do agendamento</div>
-
-    <div class="form-section">
-      <label class="fl">Horário <span class="req">*</span></label>
-      <div class="form-row">
-        <select id="f-inicio">
-          <option value="">Horário de início</option>
-          <option>07:00</option><option>07:30</option>
-          <option>08:00</option><option>08:30</option>
-          <option>09:00</option><option>09:30</option>
-          <option>10:00</option><option>10:30</option>
-          <option>11:00</option><option>11:30</option>
-          <option>13:00</option><option>13:30</option>
-          <option>14:00</option><option>14:30</option>
-          <option>15:00</option><option>15:30</option>
-          <option>16:00</option><option>16:30</option>
-          <option>17:00</option>
-        </select>
-        <select id="f-fim">
-          <option value="">Horário de término</option>
-          <option>07:30</option><option>08:00</option>
-          <option>08:30</option><option>09:00</option>
-          <option>09:30</option><option>10:00</option>
-          <option>10:30</option><option>11:00</option>
-          <option>11:30</option><option>12:00</option>
-          <option>13:30</option><option>14:00</option>
-          <option>14:30</option><option>15:00</option>
-          <option>15:30</option><option>16:00</option>
-          <option>16:30</option><option>17:00</option>
-          <option>17:30</option><option>18:00</option>
-        </select>
+      <div class="form-section">
+        <label class="fl">E-mail para confirmação <span class="req">*</span></label>
+        <input type="email" id="f-email" placeholder="seu@email.com">
       </div>
-    </div>
-
-    <div class="form-section">
-      <label class="fl">Disciplina / atividade <span class="req">*</span></label>
-      <input type="text" id="f-atividade" placeholder="Ex: Aula de informática básica, pesquisa escolar...">
-    </div>
-
-    <hr class="divisor">
-    <div class="sec-label">Configuração técnica</div>
-
-    <div class="form-section">
-      <div class="form-row">
-        <div>
-          <label class="fl">Sistema operacional <span class="req">*</span></label>
-          <select id="f-so">
-            <option value="">Selecione</option>
-            <option>Windows 10</option>
-            <option>Windows 11</option>
-            <option>Linux Mint</option>
-            <option>Qualquer um</option>
+ 
+      <hr class="divisor">
+      <div class="sec-label">Dados do agendamento</div>
+ 
+      <div class="form-section">
+        <label class="fl">Horário <span class="req">*</span></label>
+        <div class="form-row">
+          <select id="f-inicio">
+            <option value="">Horário de início</option>
+            <option>07:00</option><option>07:30</option>
+            <option>08:00</option><option>08:30</option>
+            <option>09:00</option><option>09:30</option>
+            <option>10:00</option><option>10:30</option>
+            <option>11:00</option><option>11:30</option>
+            <option>13:00</option><option>13:30</option>
+            <option>14:00</option><option>14:30</option>
+            <option>15:00</option><option>15:30</option>
+            <option>16:00</option><option>16:30</option>
+            <option>17:00</option>
+          </select>
+          <select id="f-fim">
+            <option value="">Horário de término</option>
+            <option>07:30</option><option>08:00</option>
+            <option>08:30</option><option>09:00</option>
+            <option>09:30</option><option>10:00</option>
+            <option>10:30</option><option>11:00</option>
+            <option>11:30</option><option>12:00</option>
+            <option>13:30</option><option>14:00</option>
+            <option>14:30</option><option>15:00</option>
+            <option>15:30</option><option>16:00</option>
+            <option>16:30</option><option>17:00</option>
+            <option>17:30</option><option>18:00</option>
           </select>
         </div>
-        <div>
-          <label class="fl">Software necessário</label>
-          <input type="text" id="f-software" placeholder="Ex: LibreOffice, Chrome...">
+      </div>
+ 
+      <div class="form-section">
+        <label class="fl">Disciplina / atividade <span class="req">*</span></label>
+        <input type="text" id="f-atividade" placeholder="Ex: Aula de informática básica, pesquisa escolar...">
+      </div>
+ 
+      <hr class="divisor">
+      <div class="sec-label">Configuração técnica</div>
+ 
+      <!-- SPECS FIXAS DAS MÁQUINAS -->
+      <div class="hw-box">
+        <div class="hw-title">Configuração padrão das máquinas (não alterável)</div>
+        <div class="hw-specs">
+          <div class="hw-spec">
+            <div class="hw-spec-icon">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="hw-spec-info">
+              <div class="label">Sistema</div>
+              <div class="val">Windows 10</div>
+            </div>
+          </div>
+          <div class="hw-spec">
+            <div class="hw-spec-icon">
+              <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/></svg>
+            </div>
+            <div class="hw-spec-info">
+              <div class="label">Processador</div>
+              <div class="val">Intel Celeron</div>
+            </div>
+          </div>
+          <div class="hw-spec">
+            <div class="hw-spec-icon">
+              <svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1"/><line x1="6" y1="8" x2="6" y2="16"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="8" x2="14" y2="16"/><line x1="18" y1="8" x2="18" y2="16"/></svg>
+            </div>
+            <div class="hw-spec-info">
+              <div class="label">Memória RAM</div>
+              <div class="val warn">4 GB (limitado)</div>
+            </div>
+          </div>
+          <div class="hw-spec">
+            <div class="hw-spec-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/></svg>
+            </div>
+            <div class="hw-spec-info">
+              <div class="label">Armazenamento</div>
+              <div class="val">HD mecânico</div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="form-section">
-      <label class="fl">Precisa de suporte técnico no dia? <span class="req">*</span></label>
-      <div class="radio-group">
-        <label class="radio-opt" id="opt-sim" onclick="selectAux('sim')">
-          <input type="radio" name="aux" value="sim"> Sim, preciso de auxílio
-        </label>
-        <label class="radio-opt sel-nao" id="opt-nao" onclick="selectAux('nao')">
-          <input type="radio" name="aux" value="nao" checked> Não, consigo sozinho
-        </label>
+ 
+      <div class="aviso aviso-amarelo">
+        <b>Atenção:</b> Com 4 GB de RAM as máquinas são adequadas para navegação, Office e atividades básicas. Programas como editores de vídeo, IDEs pesadas ou softwares gráficos podem não funcionar corretamente. Informe o software que pretende usar para verificação antes da aula.
       </div>
-      <div class="aux-box" id="aux-box">
-        <label class="fl" style="margin-top:10px">Descreva o suporte necessário <span class="req">*</span></label>
-        <textarea id="f-auxilio" placeholder="Descreva detalhadamente o que precisa de suporte técnico..."></textarea>
+ 
+      <div class="form-section">
+        <label class="fl">Software / programa que será utilizado</label>
+        <input type="text" id="f-software" placeholder="Ex: LibreOffice, Chrome, VS Code, Paint...">
+      </div>
+ 
+      <div class="form-section">
+        <label class="fl">Precisa de suporte técnico no dia? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-opt sel-nao" id="opt-nao" onclick="selectAux('nao')">
+            <input type="radio" name="aux" value="nao" checked> Não, consigo sozinho
+          </label>
+          <label class="radio-opt" id="opt-sim" onclick="selectAux('sim')">
+            <input type="radio" name="aux" value="sim"> Sim, preciso de auxílio
+          </label>
+        </div>
+        <div class="aux-box" id="aux-box">
+          <label class="fl" style="margin-top:10px">Descreva o suporte necessário <span class="req">*</span></label>
+          <textarea id="f-auxilio" placeholder="Descreva detalhadamente o que precisa..."></textarea>
+        </div>
+      </div>
+ 
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="closeAgenda()">Cancelar</button>
+        <button class="btn-primary" id="btn-send" onclick="enviarAgenda()">
+          <span id="btn-text">Confirmar agendamento</span>
+          <span class="spinner" id="spinner"></span>
+        </button>
       </div>
     </div>
-
-    <div class="btn-row">
-      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-send" id="btn-send" onclick="enviar()">
-        <span id="btn-text">Confirmar agendamento</span>
-        <span class="spinner" id="spinner"></span>
-      </button>
-    </div>
-
   </div>
+ 
+  <!-- SUCESSO AGENDAMENTO -->
+  <div id="view-sucesso" style="display:none">
+    <div class="sucesso-box">
+      <div class="sucesso-icon verde">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#168821" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="sucesso-title" style="color:var(--verde)">Agendamento confirmado!</div>
+      <div class="sucesso-data" id="sucesso-data"></div>
+      <div class="sucesso-msg azul">
+        Sua solicitação foi registrada e enviada ao técnico de laboratório.<br><br>
+        <b>Retornarei a você com a confirmação</b> sobre como proceder com o software solicitado — verificarei se o programa é compatível com as máquinas disponíveis (4 GB RAM / Windows 10) e se a aula poderá ocorrer conforme o planejado.<br><br>
+        Fique atento ao seu e-mail para receber o retorno.
+      </div>
+      <button class="btn-fechar azul" onclick="fecharAgenda()">Fechar</button>
+    </div>
+  </div>
+ 
 </div>
 </div>
-
+ 
+<!-- ── MODAL ATENDIMENTO PRESENCIAL ── -->
+<div class="overlay" id="overlay-atend">
+<div class="modal modal-laranja" id="modal-atend">
+ 
+  <div id="view-atend-form">
+    <div class="modal-header laranja">
+      <div class="modal-title laranja">Solicitar Atendimento Presencial</div>
+    </div>
+    <div class="modal-body">
+ 
+      <div class="aviso aviso-amarelo">
+        Preencha os campos abaixo. Uma mensagem será enviada ao técnico solicitando atendimento no laboratório ou na secretaria.
+      </div>
+ 
+      <div class="sec-label laranja">Seus dados</div>
+ 
+      <div class="form-section">
+        <label class="fl">Nome completo <span class="req">*</span></label>
+        <input type="text" id="a-nome" placeholder="Seu nome completo">
+      </div>
+      <div class="form-section">
+        <div class="form-row">
+          <div>
+            <label class="fl">Turma / Cargo <span class="req">*</span></label>
+            <input type="text" id="a-turma" placeholder="Ex: Professor 9A / Coordenador">
+          </div>
+          <div>
+            <label class="fl">E-mail <span class="req">*</span></label>
+            <input type="email" id="a-email" placeholder="seu@email.com">
+          </div>
+        </div>
+      </div>
+ 
+      <hr class="divisor">
+      <div class="sec-label laranja">Preferência de local</div>
+ 
+      <div class="form-section">
+        <div class="radio-group">
+          <label class="radio-opt sel-nao" id="loc-lab" onclick="selectLocal('laboratorio')">
+            <input type="radio" name="local" value="laboratorio" checked> No laboratório
+          </label>
+          <label class="radio-opt" id="loc-sec" onclick="selectLocal('secretaria')">
+            <input type="radio" name="local" value="secretaria"> Na secretaria
+          </label>
+        </div>
+      </div>
+ 
+      <hr class="divisor">
+      <div class="sec-label laranja">Motivo da solicitação</div>
+ 
+      <div class="form-section">
+        <label class="fl">Descreva o que precisa <span class="req">*</span></label>
+        <textarea id="a-motivo" placeholder="Ex: O dia que preciso está ocupado no calendário. Preciso usar o laboratório no dia X para a turma Y com o software Z..." style="min-height:100px"></textarea>
+      </div>
+ 
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="closeAtend()">Cancelar</button>
+        <button class="btn-primary laranja-btn" id="btn-atend-send" onclick="enviarAtend()">
+          <span id="btn-atend-text">Enviar solicitação</span>
+          <span class="spinner" id="spinner-atend"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- SUCESSO ATENDIMENTO -->
+  <div id="view-atend-sucesso" style="display:none">
+    <div class="sucesso-box">
+      <div class="sucesso-icon laranja">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E37222" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="sucesso-title" style="color:var(--laranja)">Solicitação enviada!</div>
+      <div class="sucesso-msg laranja">
+        Sua solicitação de atendimento presencial foi enviada ao técnico de laboratório.<br><br>
+        <b>Aguarde o contato</b> — o técnico entrará em contato para combinar o melhor horário para o atendimento no local escolhido.<br><br>
+        Fique atento ao seu e-mail.
+      </div>
+      <button class="btn-fechar laranja" onclick="fecharAtend()">Fechar</button>
+    </div>
+  </div>
+ 
+</div>
+</div>
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <div class="rodape">
-  <strong>Secretaria Municipal de Educação — Açailândia, MA</strong><br>
-  Sistema de Agendamento do Laboratório de Informática
+  <strong>Escola Municipal Professor Ezequias Silva Vieira — Açailândia, MA</strong><br>
+  Secretaria Municipal de Educação · Sistema de Agendamento do Laboratório de Informática
 </div>
-
+ 
+<!-- ── FIREBASE (CDN compat) ── -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+ 
 <script>
+/* ── FIREBASE CONFIG ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyALf0GRxDdRK4KrrkAF34kwrCgDAR_lC00",
+  authDomain:        "escolamaiseducacao-8e6d6.firebaseapp.com",
+  projectId:         "escolamaiseducacao-8e6d6",
+  storageBucket:     "escolamaiseducacao-8e6d6.firebasestorage.app",
+  messagingSenderId: "550169342422",
+  appId:             "1:550169342422:web:48ef9c6cfb4f7f154e7477",
+  measurementId:     "G-M4NSLYYCNH"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const COL = "agendamentos_lab";
+ 
+/* ── EMAILJS ── */
 const EMAILJS_PUBLIC_KEY  = "a4BwIFXWQYqd2AX1_";
 const EMAILJS_SERVICE_ID  = "service_pw6lpc2";
 const EMAILJS_TEMPLATE_ID = "template_g202p74";
 const EMAIL_DESTINO       = "kawakarlyndoalves@gmail.com";
-
 emailjs.init(EMAILJS_PUBLIC_KEY);
-
+ 
+/* ── ESTADO ── */
 const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
                "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const DIAS  = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-
+ 
 let hoje = new Date();
 let curYear  = hoje.getFullYear();
 let curMonth = hoje.getMonth();
-let selectedDate = null;
+let selectedDate   = null;
 let auxSelecionado = "nao";
-let ocupados = JSON.parse(localStorage.getItem("lab_ocupados") || "[]");
-
+let localSelecionado = "laboratorio";
+let ocupados = [];
+ 
+/* ── FIREBASE: listener em tempo real ── */
+db.collection(COL).onSnapshot(snap => {
+  ocupados = snap.docs.map(d => d.id);
+  renderCal();
+}, err => {
+  console.warn("Firebase:", err);
+  renderCal();
+});
+ 
+async function salvarOcupado(dateStr, dados) {
+  await db.collection(COL).doc(dateStr).set({
+    ...dados,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+ 
+/* ── CALENDÁRIO ── */
 function renderCal() {
   document.getElementById("cal-title").textContent = MESES[curMonth] + " de " + curYear;
-  const grid = document.getElementById("cal-grid");
-  grid.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.className = "cal-grid";
+ 
   DIAS.forEach(d => {
     const el = document.createElement("div");
     el.className = "day-hdr"; el.textContent = d; grid.appendChild(el);
   });
+ 
   const firstDay    = new Date(curYear, curMonth, 1).getDay();
   const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+ 
   for (let i = 0; i < firstDay; i++) {
     const el = document.createElement("div"); el.className = "day empty"; grid.appendChild(el);
   }
   for (let d = 1; d <= daysInMonth; d++) {
-    const el = document.createElement("div");
-    const dateStr   = `${curYear}-${String(curMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-    const cellDate  = new Date(curYear, curMonth, d);
-    const todayDate = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    const isPast    = cellDate < todayDate;
-    const isToday   = cellDate.getTime() === todayDate.getTime();
-    const isOcupado = ocupados.includes(dateStr);
+    const el      = document.createElement("div");
+    const dateStr = `${curYear}-${String(curMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const cell    = new Date(curYear, curMonth, d);
+    const td      = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const isPast  = cell < td;
+    const isToday = cell.getTime() === td.getTime();
+    const isOcup  = ocupados.includes(dateStr);
+ 
     el.className = "day";
     el.textContent = d;
-    if (isToday)   el.classList.add("today");
-    if (isPast)    el.classList.add("past");
-    if (isOcupado) el.classList.add("ocupado");
-    if (!isPast && !isOcupado) el.onclick = () => openModal(dateStr);
+    if (isToday) el.classList.add("today");
+    if (isPast)  el.classList.add("past");
+    if (isOcup)  el.classList.add("ocupado");
+    if (!isPast && !isOcup) el.onclick = () => openAgenda(dateStr);
     grid.appendChild(el);
   }
+ 
+  const area = document.getElementById("cal-area");
+  area.innerHTML = "";
+  area.appendChild(grid);
 }
-
+ 
 function navMonth(dir) {
   curMonth += dir;
   if (curMonth > 11) { curMonth = 0; curYear++; }
   if (curMonth < 0)  { curMonth = 11; curYear--; }
   renderCal();
 }
-
-function openModal(dateStr) {
+ 
+/* ── MODAL AGENDAMENTO ── */
+function openAgenda(dateStr) {
   selectedDate = dateStr;
   const [y, m, d] = dateStr.split("-");
   document.getElementById("modal-date").textContent =
-    DIAS[new Date(+y, +m-1, +d).getDay()] + ", " + +d + " de " + MESES[+m-1] + " de " + y;
-  document.getElementById("overlay").classList.add("show");
+    DIAS[new Date(+y,+m-1,+d).getDay()] + ", " + +d + " de " + MESES[+m-1] + " de " + y;
+  document.getElementById("view-form").style.display    = "block";
+  document.getElementById("view-sucesso").style.display = "none";
+  document.getElementById("overlay-agenda").classList.add("show");
 }
-
-function closeModal() {
-  document.getElementById("overlay").classList.remove("show");
+ 
+function closeAgenda() {
+  document.getElementById("overlay-agenda").classList.remove("show");
+  resetFormAgenda();
+}
+function fecharAgenda() {
+  document.getElementById("overlay-agenda").classList.remove("show");
+  resetFormAgenda();
+}
+function resetFormAgenda() {
   document.getElementById("aux-box").classList.remove("show");
   selectAux("nao");
   ["f-nome","f-turma","f-alunos","f-atividade","f-software","f-email","f-auxilio"]
     .forEach(id => document.getElementById(id).value = "");
-  ["f-so","f-inicio","f-fim"].forEach(id => document.getElementById(id).value = "");
+  ["f-inicio","f-fim"].forEach(id => document.getElementById(id).value = "");
 }
-
+ 
 function selectAux(val) {
   auxSelecionado = val;
   document.querySelectorAll("input[name=aux]").forEach(r => r.checked = r.value === val);
@@ -534,706 +652,139 @@ function selectAux(val) {
   document.getElementById("opt-nao").className = "radio-opt" + (val==="nao" ? " sel-nao" : "");
   document.getElementById("aux-box").classList.toggle("show", val === "sim");
 }
-
-function showToast(msg, isErr) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = "toast show " + (isErr ? "err" : "ok");
-  setTimeout(() => t.className = "toast", 5000);
-}
-
-function setLoading(on) {
+ 
+function setLoadingAgenda(on) {
   document.getElementById("btn-text").style.display = on ? "none" : "inline";
   document.getElementById("spinner").classList.toggle("show", on);
   document.getElementById("btn-send").disabled = on;
 }
-
-function enviar() {
+ 
+function enviarAgenda() {
   const nome      = document.getElementById("f-nome").value.trim();
   const turma     = document.getElementById("f-turma").value.trim();
   const alunos    = document.getElementById("f-alunos").value.trim();
   const inicio    = document.getElementById("f-inicio").value;
   const fim       = document.getElementById("f-fim").value;
   const atividade = document.getElementById("f-atividade").value.trim();
-  const so        = document.getElementById("f-so").value;
   const software  = document.getElementById("f-software").value.trim();
   const email     = document.getElementById("f-email").value.trim();
   const auxTexto  = document.getElementById("f-auxilio").value.trim();
-
-  if (!nome || !turma || !alunos || !inicio || !fim || !atividade || !so || !email) {
+ 
+  if (!nome || !turma || !alunos || !inicio || !fim || !atividade || !email) {
     showToast("Preencha todos os campos obrigatórios (*).", true); return;
   }
   if (auxSelecionado === "sim" && !auxTexto) {
     showToast("Descreva o suporte técnico necessário.", true); return;
   }
-
-  const [y, m, d] = selectedDate.split("-");
+ 
+  const [y, m, d]     = selectedDate.split("-");
   const dataFormatada = +d + " de " + MESES[+m-1] + " de " + y;
-
+ 
+  const dados = { nome, turma, alunos, inicio, fim, atividade,
+                  sistema: "Windows 10", software: software || "Não especificado",
+                  suporte: auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não",
+                  email };
+ 
+  setLoadingAgenda(true);
+ 
   const params = {
-    to_email:          EMAIL_DESTINO,
-    data:              dataFormatada,
-    nome:              nome,
-    turma:             turma,
-    alunos:            alunos,
-    horario:           inicio + " – " + fim,
-    atividade:         atividade,
-    sistema:           so,
-    software:          software || "Não especificado",
-    suporte:           auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não",
+    to_email: EMAIL_DESTINO,
+    data: dataFormatada, nome, turma, alunos,
+    horario: inicio + " – " + fim, atividade,
+    sistema: "Windows 10 (4 GB RAM)",
+    software: software || "Não especificado",
+    suporte: dados.suporte,
     email_solicitante: email
   };
-
-  setLoading(true);
-  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-    .then(() => registrar())
-    .catch(err => { console.warn("EmailJS:", err); registrar(); });
-}
-
-function registrar() {
-  ocupados.push(selectedDate);
-  localStorage.setItem("lab_ocupados", JSON.stringify(ocupados));
-  setLoading(false);
-  closeModal();
-  renderCal();
-  showToast("Agendamento confirmado! E-mail enviado com sucesso.");
-}
-
-document.getElementById("overlay").addEventListener("click", function(e) {
-  if (e.target === this) closeModal();
-});
-
-renderCal();
-</script>
-</body>
-</html>
-<style>
-  body {
-    font-family: 'Rajdhani', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── grid bg ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .page { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 32px 20px 60px; }
-
-  /* ── header ── */
-  .header { text-align: center; margin-bottom: 40px; }
-  .header-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--cyan-dim); border: 1px solid var(--border2);
-    border-radius: 999px; padding: 5px 16px;
-    font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 2px;
-    color: var(--cyan); text-transform: uppercase; margin-bottom: 18px;
-  }
-  .header-badge::before {
-    content: ''; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--cyan); animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-
-  h1 {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(20px, 4vw, 32px);
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    line-height: 1.2; margin-bottom: 8px;
-  }
-  .header p {
-    color: var(--text-mid); font-size: 15px; font-weight: 300; letter-spacing: .5px;
-  }
-
-  /* ── card ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-    opacity: .4;
-  }
-
-  /* ── calendar nav ── */
-  .cal-nav {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 24px;
-  }
-  .cal-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 14px; font-weight: 500;
-    color: var(--cyan); letter-spacing: 2px; text-transform: uppercase;
-  }
-  .nav-btn {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: var(--cyan-dim); border: 1px solid var(--border2);
-    color: var(--cyan); font-size: 18px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .2s; font-family: monospace;
-  }
-  .nav-btn:hover { background: var(--cyan-mid); }
-
-  /* ── calendar grid ── */
-  .cal-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
-  }
-  .day-hdr {
-    text-align: center; font-size: 11px; letter-spacing: 1px;
-    color: var(--text-dim); padding: 4px 0;
-    font-family: 'Orbitron', monospace; text-transform: uppercase;
-  }
-  .day {
-    aspect-ratio: 1; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    border: 1px solid transparent;
-    transition: all .18s; position: relative; color: var(--text);
-    background: var(--surface2);
-  }
-  .day:hover:not(.empty):not(.past):not(.ocupado) {
-    background: var(--cyan-dim);
-    border-color: var(--cyan);
-    color: var(--cyan);
-    transform: scale(1.08);
-  }
-  .day.today {
-    border-color: var(--cyan);
-    color: var(--cyan);
-    background: var(--cyan-dim);
-  }
-  .day.today::after {
-    content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-    width: 4px; height: 4px; border-radius: 50%; background: var(--cyan);
-  }
-  .day.ocupado {
-    background: var(--red-dim);
-    border-color: rgba(239,68,68,.3);
-    color: var(--red); cursor: not-allowed;
-  }
-  .day.ocupado::after {
-    content: '×'; position: absolute; bottom: 2px; right: 4px;
-    font-size: 9px; color: var(--red); opacity: .7;
-  }
-  .day.past { color: var(--text-dim); cursor: not-allowed; background: transparent; }
-  .day.empty { background: transparent; cursor: default; border-color: transparent; }
-
-  /* ── legend ── */
-  .legend {
-    display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;
-  }
-  .leg {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 12px; color: var(--text-dim); letter-spacing: .5px;
-  }
-  .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-  /* ── overlay ── */
-  .overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,.75);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    align-items: center; justify-content: center;
-    padding: 20px;
-  }
-  .overlay.show { display: flex; }
-
-  /* ── modal ── */
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    padding: 28px;
-    width: 100%; max-width: 520px;
-    max-height: 90vh; overflow-y: auto;
-    position: relative;
-    animation: modalIn .22s ease;
-  }
-  .modal::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
-  }
-  @keyframes modalIn {
-    from { opacity: 0; transform: translateY(16px) scale(.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  .modal-header { margin-bottom: 20px; }
-  .modal-date {
-    font-family: 'Orbitron', monospace; font-size: 11px;
-    letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; margin-bottom: 6px;
-  }
-  .modal-title {
-    font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 700;
-    color: var(--text);
-  }
-
-  /* ── form ── */
-  .form-section { margin-bottom: 16px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-  label.fl {
-    display: block; font-size: 11px; font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase;
-    color: var(--text-dim); margin-bottom: 6px;
-  }
-
-  input[type=text], input[type=email], input[type=number], select, textarea {
-    width: 100%; padding: 9px 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px; font-weight: 500;
-    transition: border-color .2s;
-    -webkit-appearance: none;
-  }
-  input::placeholder, textarea::placeholder { color: var(--text-dim); }
-  input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--cyan);
-    box-shadow: 0 0 0 3px rgba(0,200,255,.08);
-  }
-  select { cursor: pointer; }
-  select option { background: #0b1120; }
-  textarea { resize: vertical; min-height: 80px; }
-
-  /* ── radio ── */
-  .radio-group { display: flex; gap: 12px; }
-  .radio-opt {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 14px; font-weight: 500; cursor: pointer;
-    padding: 8px 14px; border-radius: 8px;
-    border: 1px solid var(--border2);
-    background: var(--surface2); color: var(--text-mid);
-    transition: all .18s; flex: 1; justify-content: center;
-  }
-  .radio-opt input { display: none; }
-  .radio-opt.selected-sim {
-    background: var(--green-dim); border-color: rgba(34,197,94,.4);
-    color: var(--green);
-  }
-  .radio-opt.selected-nao {
-    background: var(--cyan-dim); border-color: var(--border2);
-    color: var(--cyan);
-  }
-
-  .aux-box { display: none; margin-top: 12px; }
-  .aux-box.show { display: block; }
-
-  /* ── buttons ── */
-  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
-  .btn-cancel {
-    padding: 10px 18px; border-radius: 10px;
-    background: transparent; border: 1px solid var(--border2);
-    color: var(--text-mid); font-family: 'Rajdhani', sans-serif;
-    font-size: 14px; font-weight: 600; letter-spacing: .5px; cursor: pointer;
-    transition: all .18s;
-  }
-  .btn-cancel:hover { background: var(--cyan-dim); color: var(--text); }
-
-  .btn-send {
-    flex: 1; padding: 10px;
-    background: linear-gradient(135deg, rgba(0,200,255,.15), rgba(168,85,247,.12));
-    border: 1px solid var(--cyan);
-    border-radius: 10px; color: var(--cyan);
-    font-family: 'Orbitron', monospace; font-size: 12px;
-    font-weight: 700; letter-spacing: 1px; cursor: pointer;
-    transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-send:hover:not(:disabled) {
-    background: linear-gradient(135deg, rgba(0,200,255,.25), rgba(168,85,247,.2));
-    box-shadow: 0 0 20px rgba(0,200,255,.2);
-  }
-  .btn-send:disabled { opacity: .5; cursor: not-allowed; }
-
-  /* ── spinner ── */
-  .spinner {
-    display: none; width: 14px; height: 14px;
-    border: 2px solid rgba(0,200,255,.3); border-top-color: var(--cyan);
-    border-radius: 50%; animation: spin .7s linear infinite;
-  }
-  .spinner.show { display: inline-block; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── toast ── */
-  .toast {
-    display: none; position: fixed;
-    bottom: 28px; left: 50%; transform: translateX(-50%);
-    z-index: 200; padding: 12px 24px; border-radius: 999px;
-    font-family: 'Rajdhani', sans-serif; font-size: 14px;
-    font-weight: 600; letter-spacing: .5px; white-space: nowrap;
-    border: 1px solid; animation: toastIn .25s ease;
-  }
-  .toast.show { display: block; }
-  .toast.ok {
-    background: rgba(34,197,94,.15); border-color: rgba(34,197,94,.4);
-    color: var(--green);
-  }
-  .toast.err {
-    background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4);
-    color: var(--red);
-  }
-  @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(12px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
-
-  /* ── scrollbar ── */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-
-  /* ── mobile ── */
-  @media(max-width:480px){
-    .form-row, .form-row-3 { grid-template-columns: 1fr; }
-    .card { padding: 18px; }
-    .modal { padding: 20px; }
-  }
-</style>
-</head>
-<body>
-
-<div class="page">
-
-  <div class="header">
-    <div class="header-badge">Sistema ativo</div>
-    <h1>Laboratório de Informática</h1>
-    <p>Secretaria Municipal de Educação — Açailândia, MA</p>
-  </div>
-
-  <div class="card">
-    <div class="cal-nav">
-      <button class="nav-btn" onclick="navMonth(-1)">&#8249;</button>
-      <span class="cal-title" id="cal-title"></span>
-      <button class="nav-btn" onclick="navMonth(1)">&#8250;</button>
-    </div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:var(--cyan)"></div> hoje</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--red)"></div> ocupado</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--surface2);border:1px solid var(--border2)"></div> disponível</div>
-    </div>
-  </div>
-
-</div>
-
-<!-- OVERLAY / MODAL -->
-<div class="overlay" id="overlay">
-<div class="modal" id="modal">
-
-  <div class="modal-header">
-    <div class="modal-date" id="modal-date"></div>
-    <div class="modal-title">Agendamento do laboratório</div>
-  </div>
-
-  <div class="form-section">
-    <label class="fl">Nome completo</label>
-    <input type="text" id="f-nome" placeholder="Seu nome completo">
-  </div>
-
-  <div class="form-section">
-    <div class="form-row">
-      <div>
-        <label class="fl">Turma / Turno</label>
-        <input type="text" id="f-turma" placeholder="Ex: 9A — manhã">
-      </div>
-      <div>
-        <label class="fl">Qtd. de alunos</label>
-        <input type="number" id="f-alunos" placeholder="Ex: 30" min="1" max="40">
-      </div>
-    </div>
-  </div>
-
-  <div class="form-section">
-    <label class="fl">Horário</label>
-    <div class="form-row">
-      <div>
-        <select id="f-inicio">
-          <option value="">Início</option>
-          <option>07:00</option><option>07:30</option>
-          <option>08:00</option><option>08:30</option>
-          <option>09:00</option><option>09:30</option>
-          <option>10:00</option><option>10:30</option>
-          <option>11:00</option><option>11:30</option>
-          <option>13:00</option><option>13:30</option>
-          <option>14:00</option><option>14:30</option>
-          <option>15:00</option><option>15:30</option>
-          <option>16:00</option><option>16:30</option>
-          <option>17:00</option>
-        </select>
-      </div>
-      <div>
-        <select id="f-fim">
-          <option value="">Término</option>
-          <option>07:30</option><option>08:00</option>
-          <option>08:30</option><option>09:00</option>
-          <option>09:30</option><option>10:00</option>
-          <option>10:30</option><option>11:00</option>
-          <option>11:30</option><option>12:00</option>
-          <option>13:30</option><option>14:00</option>
-          <option>14:30</option><option>15:00</option>
-          <option>15:30</option><option>16:00</option>
-          <option>16:30</option><option>17:00</option>
-          <option>17:30</option><option>18:00</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="form-section">
-    <label class="fl">Disciplina / atividade</label>
-    <input type="text" id="f-atividade" placeholder="Ex: Aula de informática básica">
-  </div>
-
-  <div class="form-section">
-    <label class="fl">Configuração dos PCs</label>
-    <div class="form-row">
-      <div>
-        <select id="f-so">
-          <option value="">Sistema operacional</option>
-          <option>Windows 10</option>
-          <option>Windows 11</option>
-          <option>Linux Mint</option>
-          <option>Qualquer um</option>
-        </select>
-      </div>
-      <div>
-        <input type="text" id="f-software" placeholder="Software necessário (Ex: Chrome)">
-      </div>
-    </div>
-  </div>
-
-  <div class="form-section">
-    <label class="fl">Precisa de suporte técnico no dia?</label>
-    <div class="radio-group">
-      <label class="radio-opt" id="opt-sim" onclick="selectAux('sim')">
-        <input type="radio" name="aux" value="sim"> Sim, preciso de auxílio
-      </label>
-      <label class="radio-opt selected-nao" id="opt-nao" onclick="selectAux('nao')">
-        <input type="radio" name="aux" value="nao" checked> Não, consigo sozinho
-      </label>
-    </div>
-    <div class="aux-box" id="aux-box">
-      <label class="fl" style="margin-top:10px">Descreva o que precisa de auxílio</label>
-      <textarea id="f-auxilio" placeholder="Explique detalhadamente o suporte técnico necessário..."></textarea>
-    </div>
-  </div>
-
-  <div class="form-section">
-    <label class="fl">Seu e-mail (para confirmação)</label>
-    <input type="email" id="f-email" placeholder="seu@email.com">
-  </div>
-
-  <div class="btn-row">
-    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-    <button class="btn-send" id="btn-send" onclick="enviar()">
-      <span id="btn-text">Confirmar agendamento</span>
-      <span class="spinner" id="spinner"></span>
-    </button>
-  </div>
-
-</div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-/* ── EMAILJS CONFIG ──────────────────────────────────────────
-   Coloque seus IDs aqui (obtenha em emailjs.com):             */
-const EMAILJS_PUBLIC_KEY  = "a4BwIFXWQYqd2AX1_";
-const EMAILJS_SERVICE_ID  = "service_pw6lpc2";
-const EMAILJS_TEMPLATE_ID = "template_g202p74";
-const EMAIL_DESTINO       = "kawakarlyndoalves@gmail.com";
-/* ──────────────────────────────────────────────────────────── */
-
-emailjs.init(EMAILJS_PUBLIC_KEY);
-
-const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-               "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-const DIAS  = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-
-let hoje = new Date();
-let curYear  = hoje.getFullYear();
-let curMonth = hoje.getMonth();
-let selectedDate = null;
-let auxSelecionado = "nao";
-
-let ocupados = JSON.parse(localStorage.getItem("lab_ocupados") || "[]");
-
-function renderCal() {
-  document.getElementById("cal-title").textContent =
-    MESES[curMonth].toUpperCase() + "  " + curYear;
-
-  const grid = document.getElementById("cal-grid");
-  grid.innerHTML = "";
-
-  DIAS.forEach(d => {
-    const el = document.createElement("div");
-    el.className = "day-hdr"; el.textContent = d;
-    grid.appendChild(el);
+ 
+  Promise.all([
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params).catch(e => console.warn(e)),
+    salvarOcupado(selectedDate, dados)
+  ]).finally(() => {
+    setLoadingAgenda(false);
+    document.getElementById("view-form").style.display    = "none";
+    document.getElementById("view-sucesso").style.display = "block";
+    document.getElementById("sucesso-data").textContent   = dataFormatada;
   });
-
-  const firstDay    = new Date(curYear, curMonth, 1).getDay();
-  const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
-
-  for (let i = 0; i < firstDay; i++) {
-    const el = document.createElement("div");
-    el.className = "day empty"; grid.appendChild(el);
+}
+ 
+/* ── MODAL ATENDIMENTO PRESENCIAL ── */
+function abrirAtendimento() {
+  document.getElementById("view-atend-form").style.display    = "block";
+  document.getElementById("view-atend-sucesso").style.display = "none";
+  document.getElementById("overlay-atend").classList.add("show");
+}
+function closeAtend() { document.getElementById("overlay-atend").classList.remove("show"); resetFormAtend(); }
+function fecharAtend() { document.getElementById("overlay-atend").classList.remove("show"); resetFormAtend(); }
+function resetFormAtend() {
+  ["a-nome","a-turma","a-email","a-motivo"].forEach(id => document.getElementById(id).value = "");
+  selectLocal("laboratorio");
+}
+ 
+function selectLocal(val) {
+  localSelecionado = val;
+  document.querySelectorAll("input[name=local]").forEach(r => r.checked = r.value === val);
+  document.getElementById("loc-lab").className = "radio-opt" + (val==="laboratorio" ? " sel-nao" : "");
+  document.getElementById("loc-sec").className = "radio-opt" + (val==="secretaria"  ? " sel-nao" : "");
+}
+ 
+function setLoadingAtend(on) {
+  document.getElementById("btn-atend-text").style.display = on ? "none" : "inline";
+  document.getElementById("spinner-atend").classList.toggle("show", on);
+  document.getElementById("btn-atend-send").disabled = on;
+}
+ 
+function enviarAtend() {
+  const nome   = document.getElementById("a-nome").value.trim();
+  const turma  = document.getElementById("a-turma").value.trim();
+  const email  = document.getElementById("a-email").value.trim();
+  const motivo = document.getElementById("a-motivo").value.trim();
+ 
+  if (!nome || !turma || !email || !motivo) {
+    showToast("Preencha todos os campos obrigatórios (*).", true); return;
   }
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const el = document.createElement("div");
-    const dateStr = `${curYear}-${String(curMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-    const cellDate = new Date(curYear, curMonth, d);
-    const todayDate = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    const isPast    = cellDate < todayDate;
-    const isToday   = cellDate.getTime() === todayDate.getTime();
-    const isOcupado = ocupados.includes(dateStr);
-
-    el.className = "day";
-    el.textContent = d;
-    if (isToday)   el.classList.add("today");
-    if (isPast)    el.classList.add("past");
-    if (isOcupado) el.classList.add("ocupado");
-
-    if (!isPast && !isOcupado) {
-      el.onclick = () => openModal(dateStr, d);
-    }
-    grid.appendChild(el);
-  }
-}
-
-function navMonth(dir) {
-  curMonth += dir;
-  if (curMonth > 11) { curMonth = 0; curYear++; }
-  if (curMonth < 0)  { curMonth = 11; curYear--; }
-  renderCal();
-}
-
-function openModal(dateStr, day) {
-  selectedDate = dateStr;
-  const [y, m, d] = dateStr.split("-");
-  document.getElementById("modal-date").textContent =
-    DIAS[new Date(Number(y), Number(m)-1, Number(d)).getDay()] + ", " +
-    Number(d) + " de " + MESES[Number(m)-1] + " de " + y;
-  document.getElementById("overlay").classList.add("show");
-}
-
-function closeModal() {
-  document.getElementById("overlay").classList.remove("show");
-  document.getElementById("aux-box").classList.remove("show");
-  selectAux("nao");
-  ["f-nome","f-turma","f-alunos","f-atividade","f-software","f-email","f-auxilio"].forEach(id => {
-    document.getElementById(id).value = "";
-  });
-  ["f-so","f-inicio","f-fim"].forEach(id => { document.getElementById(id).value = ""; });
-}
-
-function selectAux(val) {
-  auxSelecionado = val;
-  document.querySelectorAll("input[name=aux]").forEach(r => r.checked = r.value === val);
-  document.getElementById("opt-sim").className =
-    "radio-opt" + (val === "sim" ? " selected-sim" : "");
-  document.getElementById("opt-nao").className =
-    "radio-opt" + (val === "nao" ? " selected-nao" : "");
-  document.getElementById("aux-box").classList.toggle("show", val === "sim");
-}
-
-function showToast(msg, isErr) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = "toast show " + (isErr ? "err" : "ok");
-  setTimeout(() => t.className = "toast", 4500);
-}
-
-function setLoading(on) {
-  document.getElementById("btn-text").style.display = on ? "none" : "inline";
-  document.getElementById("spinner").classList.toggle("show", on);
-  document.getElementById("btn-send").disabled = on;
-}
-
-function enviar() {
-  const nome     = document.getElementById("f-nome").value.trim();
-  const turma    = document.getElementById("f-turma").value.trim();
-  const alunos   = document.getElementById("f-alunos").value.trim();
-  const inicio   = document.getElementById("f-inicio").value;
-  const fim      = document.getElementById("f-fim").value;
-  const atividade= document.getElementById("f-atividade").value.trim();
-  const so       = document.getElementById("f-so").value;
-  const software = document.getElementById("f-software").value.trim();
-  const email    = document.getElementById("f-email").value.trim();
-  const auxTexto = document.getElementById("f-auxilio").value.trim();
-
-  if (!nome || !turma || !alunos || !inicio || !fim || !atividade || !so || !email) {
-    showToast("Preencha todos os campos obrigatórios.", true); return;
-  }
-  if (auxSelecionado === "sim" && !auxTexto) {
-    showToast("Descreva o suporte técnico necessário.", true); return;
-  }
-
-  const [y, m, d] = selectedDate.split("-");
-  const dataFormatada = Number(d) + " de " + MESES[Number(m)-1] + " de " + y;
-
+ 
+  setLoadingAtend(true);
+ 
+  const local = localSelecionado === "laboratorio" ? "No laboratório" : "Na secretaria";
+ 
   const params = {
     to_email:          EMAIL_DESTINO,
-    data:              dataFormatada,
-    nome:              nome,
-    turma:             turma,
-    alunos:            alunos,
-    horario:           inicio + " – " + fim,
-    atividade:         atividade,
-    sistema:           so,
-    software:          software || "Não especificado",
-    suporte:           auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não",
+    data:              "Atendimento presencial",
+    nome,
+    turma,
+    alunos:            "—",
+    horario:           "A combinar",
+    atividade:         "ATENDIMENTO PRESENCIAL",
+    sistema:           local,
+    software:          motivo,
+    suporte:           "Solicitação de atendimento presencial",
     email_solicitante: email
   };
-
-  setLoading(true);
-
+ 
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-    .then(() => {
-      registrar();
-    })
-    .catch(err => {
-      console.warn("EmailJS erro:", err);
-      registrar();
+    .catch(e => console.warn(e))
+    .finally(() => {
+      setLoadingAtend(false);
+      document.getElementById("view-atend-form").style.display    = "none";
+      document.getElementById("view-atend-sucesso").style.display = "block";
     });
 }
-
-function registrar() {
-  ocupados.push(selectedDate);
-  localStorage.setItem("lab_ocupados", JSON.stringify(ocupados));
-  setLoading(false);
-  closeModal();
-  renderCal();
-  showToast("Agendamento confirmado! Email enviado.");
+ 
+/* ── TOAST ── */
+function showToast(msg, isErr) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = "toast show " + (isErr ? "err" : "ok");
+  setTimeout(() => t.className = "toast", 5000);
 }
-
-document.getElementById("overlay").addEventListener("click", function(e) {
-  if (e.target === this) closeModal();
+ 
+/* ── FECHAR OVERLAY AO CLICAR FORA ── */
+document.getElementById("overlay-agenda").addEventListener("click", function(e) {
+  if (e.target === this) closeAgenda();
 });
-
-renderCal();
+document.getElementById("overlay-atend").addEventListener("click", function(e) {
+  if (e.target === this) closeAtend();
+});
 </script>
 </body>
 </html>
