@@ -11,7 +11,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyALf0GRxDdRK4KrrkAF34kwrCgDAR_lC00",
@@ -51,6 +51,74 @@
       erroEl.textContent = "Email ou senha incorretos";
       erroEl.style.display = "block";
       console.error("Login error:", e);
+    }
+  };
+
+  /* CADASTRO */
+  window.cadastro = async function () {
+    const nome = document.getElementById("cadastro-nome").value.trim();
+    const email = document.getElementById("cadastro-email").value.trim();
+    const senha = document.getElementById("cadastro-senha").value;
+    const senhaConfirm = document.getElementById("cadastro-senha-confirm").value;
+    const erroEl = document.getElementById("cadastro-erro");
+
+    if (!nome || !email || !senha || !senhaConfirm) {
+      erroEl.textContent = "Preencha todos os campos";
+      erroEl.style.display = "block";
+      return;
+    }
+
+    if (senha !== senhaConfirm) {
+      erroEl.textContent = "As senhas não conferem";
+      erroEl.style.display = "block";
+      return;
+    }
+
+    if (senha.length < 6) {
+      erroEl.textContent = "A senha deve ter no mínimo 6 caracteres";
+      erroEl.style.display = "block";
+      return;
+    }
+
+    try {
+      erroEl.style.display = "none";
+      const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+      document.getElementById("cadastro-sucesso").style.display = "block";
+      document.getElementById("cadastro-form").style.display = "none";
+      setTimeout(() => {
+        document.getElementById("cadastro-sucesso").style.display = "none";
+        document.getElementById("cadastro-form").style.display = "block";
+        document.getElementById("cadastro-nome").value = "";
+        document.getElementById("cadastro-email").value = "";
+        document.getElementById("cadastro-senha").value = "";
+        document.getElementById("cadastro-senha-confirm").value = "";
+        window.trocarAba("login");
+      }, 3000);
+    } catch (e) {
+      if (e.code === "auth/email-already-in-use") {
+        erroEl.textContent = "Este email já está registrado";
+      } else if (e.code === "auth/invalid-email") {
+        erroEl.textContent = "Email inválido";
+      } else {
+        erroEl.textContent = "Erro ao criar conta: " + e.message;
+      }
+      erroEl.style.display = "block";
+      console.error("Cadastro error:", e);
+    }
+  };
+
+  /* TROCAR ABAS */
+  window.trocarAba = function (aba) {
+    if (aba === "login") {
+      document.getElementById("login-form").style.display = "block";
+      document.getElementById("cadastro-form").style.display = "none";
+      document.getElementById("aba-login").classList.add("aba-ativa");
+      document.getElementById("aba-cadastro").classList.remove("aba-ativa");
+    } else if (aba === "cadastro") {
+      document.getElementById("login-form").style.display = "none";
+      document.getElementById("cadastro-form").style.display = "block";
+      document.getElementById("aba-login").classList.remove("aba-ativa");
+      document.getElementById("aba-cadastro").classList.add("aba-ativa");
     }
   };
 
@@ -305,16 +373,68 @@ textarea{resize:vertical;min-height:80px}
 .login-box button:hover{
   background:#0C326F;
 }
-#login-erro{
+.login-box .erro{
   color:var(--red);
   margin-top:10px;
   display:none;
   font-size:13px;
   font-weight:600;
 }
+.login-box .sucesso{
+  color:var(--verde);
+  margin-top:10px;
+  display:none;
+  font-size:13px;
+  font-weight:600;
+  text-align:center;
+}
+
+/* ── ABAS ── */
+.login-abas{
+  display:flex;
+  gap:0;
+  margin-bottom:20px;
+  border-bottom:2px solid var(--cinza2);
+}
+.aba-btn{
+  flex:1;
+  padding:12px;
+  background:transparent;
+  border:none;
+  border-bottom:3px solid transparent;
+  color:var(--cinza5);
+  font-family:'Source Sans 3',sans-serif;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .15s;
+}
+.aba-btn:hover{
+  color:var(--azul);
+}
+.aba-btn.aba-ativa{
+  color:var(--azul);
+  border-bottom-color:var(--azul);
+}
 
 #main-content{
   display:none;
+}
+
+/* Ajuste para inputs do cadastro */
+.login-box input[type="text"]{
+  width:100%;
+  margin-top:15px;
+  padding:10px;
+  border:1px solid var(--cinza3);
+  border-radius:4px;
+  font-family:'Source Sans 3',sans-serif;
+  font-size:14px;
+}
+.login-box input[type="text"]:focus{
+  outline:none;
+  border-color:var(--azul);
+  box-shadow:0 0 0 3px rgba(19,81,180,.12);
 }
  
 @media(max-width:500px){
@@ -329,11 +449,33 @@ textarea{resize:vertical;min-height:80px}
 
 <div id="login-overlay">
   <div class="login-box">
-    <h2>Login do Sistema</h2>
-    <input type="email" id="login-email" placeholder="Email">
-    <input type="password" id="login-senha" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-    <div id="login-erro"></div>
+    <h2>Sistema de Agendamento</h2>
+    
+    <div class="login-abas">
+      <button class="aba-btn aba-ativa" id="aba-login" onclick="trocarAba('login')">Login</button>
+      <button class="aba-btn" id="aba-cadastro" onclick="trocarAba('cadastro')">Criar Conta</button>
+    </div>
+
+    <!-- FORMULÁRIO DE LOGIN -->
+    <div id="login-form">
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-senha" placeholder="Senha">
+      <button onclick="login()">Entrar</button>
+      <div id="login-erro" class="erro"></div>
+    </div>
+
+    <!-- FORMULÁRIO DE CADASTRO -->
+    <div id="cadastro-form" style="display:none">
+      <input type="text" id="cadastro-nome" placeholder="Seu nome">
+      <input type="email" id="cadastro-email" placeholder="Email">
+      <input type="password" id="cadastro-senha" placeholder="Senha (mín. 6 caracteres)">
+      <input type="password" id="cadastro-senha-confirm" placeholder="Confirmar senha">
+      <button onclick="cadastro()">Criar Conta</button>
+      <div id="cadastro-erro" class="erro"></div>
+      <div id="cadastro-sucesso" class="sucesso" style="display:none">
+        ✓ Conta criada com sucesso!<br>Redirecionando...
+      </div>
+    </div>
   </div>
 </div>
 
@@ -821,6 +963,9 @@ textarea{resize:vertical;min-height:80px}
   });
   document.getElementById("login-senha").addEventListener("keypress", function(e) {
     if (e.key === "Enter") login();
+  });
+  document.getElementById("cadastro-senha-confirm").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") cadastro();
   });
   
   aguardarFb().then(() => renderCal());
