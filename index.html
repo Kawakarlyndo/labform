@@ -532,13 +532,13 @@ textarea{resize:vertical;min-height:80px}
         <div class="turno-btn" id="btn-turno-manha" onclick="selecionarTurno('manha')">
           <div class="tb-icon">&#127749;</div>
           <div class="tb-nome">Manhã</div>
-          <div class="tb-hora">07:00 – 11:30</div>
+          <div class="tb-hora">07:30 – 11:30</div>
           <div class="tb-status" id="status-manha"></div>
         </div>
         <div class="turno-btn" id="btn-turno-tarde" onclick="selecionarTurno('tarde')">
           <div class="tb-icon">&#127748;</div>
           <div class="tb-nome">Tarde</div>
-          <div class="tb-hora">13:00 – 17:30</div>
+          <div class="tb-hora">13:30 – 17:30</div>
           <div class="tb-status" id="status-tarde"></div>
         </div>
       </div>
@@ -656,12 +656,12 @@ textarea{resize:vertical;min-height:80px}
   /* ── HORÁRIOS POR TURNO ── */
   const HORARIOS = {
     manha: {
-      inicio: ["07:00","07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00"],
-      fim:    ["07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00","11:30"]
+      inicio: ["07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00"],
+      fim:    ["08:00","08:30","09:00","09:30","10:00","10:30","11:00","11:30"]
     },
     tarde: {
-      inicio: ["13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00"],
-      fim:    ["13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00"]
+      inicio: ["13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00"],
+      fim:    ["14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00"]
     }
   };
   
