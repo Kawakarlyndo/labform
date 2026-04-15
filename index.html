@@ -10,7 +10,7 @@
 <!-- Firebase SDK (módulo ES) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, get, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -27,22 +27,16 @@
   const db = getDatabase(app);
   const auth = getAuth(app);
 
-  /* FIREBASE GLOBAL */
-  window._fbGet = path => get(ref(db, path));
+  window._fbGet    = path => get(ref(db, path));
   window._fbUpdate = (path, v) => update(ref(db, path), v);
+  window._fbRemove = path => remove(ref(db, path));
+  window._fbGetCurrentUser = () => auth.currentUser;
 
-  /* LOGIN */
   window.login = async function () {
     const email = document.getElementById("login-email").value;
     const senha = document.getElementById("login-senha").value;
     const erroEl = document.getElementById("login-erro");
-
-    if (!email || !senha) {
-      erroEl.textContent = "Preencha email e senha";
-      erroEl.style.display = "block";
-      return;
-    }
-
+    if (!email || !senha) { erroEl.textContent = "Preencha email e senha"; erroEl.style.display = "block"; return; }
     try {
       erroEl.style.display = "none";
       await signInWithEmailAndPassword(auth, email, senha);
@@ -50,71 +44,44 @@
     } catch (e) {
       erroEl.textContent = "Email ou senha incorretos";
       erroEl.style.display = "block";
-      console.error("Login error:", e);
     }
   };
 
-  /* CADASTRO */
   window.cadastro = async function () {
     const nome = document.getElementById("cadastro-nome").value.trim();
     const email = document.getElementById("cadastro-email").value.trim();
     const senha = document.getElementById("cadastro-senha").value;
     const senhaConfirm = document.getElementById("cadastro-senha-confirm").value;
     const erroEl = document.getElementById("cadastro-erro");
-
-    if (!nome || !email || !senha || !senhaConfirm) {
-      erroEl.textContent = "Preencha todos os campos";
-      erroEl.style.display = "block";
-      return;
-    }
-
-    if (senha !== senhaConfirm) {
-      erroEl.textContent = "As senhas não conferem";
-      erroEl.style.display = "block";
-      return;
-    }
-
-    if (senha.length < 6) {
-      erroEl.textContent = "A senha deve ter no mínimo 6 caracteres";
-      erroEl.style.display = "block";
-      return;
-    }
-
+    if (!nome || !email || !senha || !senhaConfirm) { erroEl.textContent = "Preencha todos os campos"; erroEl.style.display = "block"; return; }
+    if (senha !== senhaConfirm) { erroEl.textContent = "As senhas não conferem"; erroEl.style.display = "block"; return; }
+    if (senha.length < 6) { erroEl.textContent = "A senha deve ter no mínimo 6 caracteres"; erroEl.style.display = "block"; return; }
     try {
       erroEl.style.display = "none";
-      const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+      await createUserWithEmailAndPassword(auth, email, senha);
       document.getElementById("cadastro-sucesso").style.display = "block";
       document.getElementById("cadastro-form").style.display = "none";
       setTimeout(() => {
         document.getElementById("cadastro-sucesso").style.display = "none";
         document.getElementById("cadastro-form").style.display = "block";
-        document.getElementById("cadastro-nome").value = "";
-        document.getElementById("cadastro-email").value = "";
-        document.getElementById("cadastro-senha").value = "";
-        document.getElementById("cadastro-senha-confirm").value = "";
+        ["cadastro-nome","cadastro-email","cadastro-senha","cadastro-senha-confirm"].forEach(id => document.getElementById(id).value = "");
         window.trocarAba("login");
       }, 3000);
     } catch (e) {
-      if (e.code === "auth/email-already-in-use") {
-        erroEl.textContent = "Este email já está registrado";
-      } else if (e.code === "auth/invalid-email") {
-        erroEl.textContent = "Email inválido";
-      } else {
-        erroEl.textContent = "Erro ao criar conta: " + e.message;
-      }
+      if (e.code === "auth/email-already-in-use") erroEl.textContent = "Este email já está registrado";
+      else if (e.code === "auth/invalid-email") erroEl.textContent = "Email inválido";
+      else erroEl.textContent = "Erro ao criar conta: " + e.message;
       erroEl.style.display = "block";
-      console.error("Cadastro error:", e);
     }
   };
 
-  /* TROCAR ABAS */
   window.trocarAba = function (aba) {
     if (aba === "login") {
       document.getElementById("login-form").style.display = "block";
       document.getElementById("cadastro-form").style.display = "none";
       document.getElementById("aba-login").classList.add("aba-ativa");
       document.getElementById("aba-cadastro").classList.remove("aba-ativa");
-    } else if (aba === "cadastro") {
+    } else {
       document.getElementById("login-form").style.display = "none";
       document.getElementById("cadastro-form").style.display = "block";
       document.getElementById("aba-login").classList.remove("aba-ativa");
@@ -122,18 +89,18 @@
     }
   };
 
-  /* SESSÃO */
   onAuthStateChanged(auth, user => {
     if (user) {
       document.getElementById("login-overlay").style.display = "none";
       document.getElementById("main-content").style.display = "block";
+      window._currentUserEmail = user.email;
     } else {
       document.getElementById("login-overlay").style.display = "flex";
       document.getElementById("main-content").style.display = "none";
+      window._currentUserEmail = null;
     }
   });
 
-  /* READY */
   window._fbReady = true;
   document.dispatchEvent(new Event("firebase-ready"));
 </script>
@@ -164,8 +131,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Source Sans 3','Segoe UI',sans-serif;background:var(--cinza1);color:var(--texto);min-height:100vh}
- 
-/* ── HEADER ── */
+
 .gov-top{background:var(--azul-esc);padding:8px 0;border-bottom:3px solid var(--amarelo)}
 .gov-top-inner{max-width:960px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px}
 .brasao{width:38px;height:38px;background:var(--amarelo);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--azul-esc);flex-shrink:0}
@@ -177,41 +143,31 @@ body{font-family:'Source Sans 3','Segoe UI',sans-serif;background:var(--cinza1);
 .gov-bar p{font-size:14px;color:rgba(255,255,255,.8);margin-bottom:16px}
 .breadcrumb{display:inline-flex;gap:6px;align-items:center;background:rgba(0,0,0,.18);padding:7px 16px;border-radius:4px 4px 0 0;font-size:12px;color:rgba(255,255,255,.7)}
 .breadcrumb span{color:var(--amarelo);font-weight:600}
- 
-/* ── MAIN / CARD ── */
+
 .main{max-width:960px;margin:0 auto;padding:28px 20px 60px}
-.card{background:var(--branco);border:1px solid var(--cinza2);border-top:3px solid var(--azul);border-radius:4px;padding:28px;box-shadow:var(--shadow)}
+.card{background:var(--branco);border:1px solid var(--cinza2);border-top:3px solid var(--azul);border-radius:4px;padding:28px;box-shadow:var(--shadow);margin-bottom:24px}
 .card-title{font-size:15px;font-weight:700;color:var(--azul-esc);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--cinza2);display:flex;align-items:center;gap:10px}
 .card-title::before{content:'';width:4px;height:20px;background:var(--azul);border-radius:2px;display:inline-block}
- 
-/* ── CAL NAV ── */
+
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;background:var(--azul-bg);border:1px solid var(--azul-claro);border-radius:4px;padding:10px 16px}
 .cal-title{font-size:15px;font-weight:700;color:var(--azul-esc)}
 .nav-btn{width:32px;height:32px;border-radius:4px;background:var(--azul);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
 .nav-btn:hover{background:var(--azul-esc)}
 .cal-loading{text-align:center;padding:40px;color:var(--cinza4);font-size:14px}
- 
-/* ── GRID ── */
+
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .day-hdr{text-align:center;font-size:11px;font-weight:700;color:var(--azul);padding:6px 0;letter-spacing:1px;text-transform:uppercase}
- 
-/* célula do dia */
-.day{
-  aspect-ratio:1;border-radius:4px;
-  display:flex;align-items:center;justify-content:center;flex-direction:column;
-  font-size:13px;font-weight:600;cursor:pointer;
-  border:1px solid var(--cinza2);transition:all .15s;
-  position:relative;color:var(--texto);background:var(--branco);overflow:hidden;gap:1px
-}
+
+.day{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--cinza2);transition:all .15s;position:relative;color:var(--texto);background:var(--branco);overflow:hidden;gap:1px}
 .day-num{position:relative;z-index:2;line-height:1}
- 
-/* faixas visuais de turno (metade superior = manhã, inferior = tarde) */
 .faixa-m,.faixa-t{position:absolute;left:0;right:0;height:50%;z-index:1}
 .faixa-m{top:0}
 .faixa-t{bottom:0}
 .faixa-m.ocup{background:rgba(224,120,0,.20)}
 .faixa-t.ocup{background:rgba(224,120,0,.20)}
- 
+.faixa-m.meu{background:rgba(22,136,33,.25)}
+.faixa-t.meu{background:rgba(22,136,33,.25)}
+
 .day.livre:hover{background:var(--azul);border-color:var(--azul);color:#fff}
 .day.livre:hover .faixa-m,.day.livre:hover .faixa-t{background:transparent}
 .day.meio{border-color:var(--laranja);color:var(--laranja)}
@@ -221,20 +177,19 @@ body{font-family:'Source Sans 3','Segoe UI',sans-serif;background:var(--cinza1);
 .day.today::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--azul);z-index:3}
 .day.past{color:var(--cinza3);cursor:not-allowed;background:var(--cinza1);border-color:var(--cinza2)}
 .day.empty{background:transparent;border-color:transparent;cursor:default}
- 
-/* dots de turno */
+.day.meu-dia{border-color:var(--verde)!important;cursor:pointer!important}
+
 .turnos-badge{position:absolute;bottom:3px;left:0;right:0;display:flex;justify-content:center;gap:2px;z-index:3}
 .dot{width:5px;height:5px;border-radius:50%}
 .dot.ocup{background:var(--laranja)}
 .dot.livre{background:var(--cinza3)}
+.dot.meu{background:var(--verde)}
 .day.cheio .dot{background:var(--red)}
- 
-/* ── LEGENDA ── */
+
 .legend{display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--cinza2);flex-wrap:wrap}
 .leg{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--cinza5)}
 .leg-box{width:14px;height:14px;border-radius:2px;border:1px solid;flex-shrink:0}
- 
-/* ── OVERLAY / MODAL ── */
+
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
 .overlay.show{display:flex}
 .modal{background:var(--branco);border-radius:4px;border-top:4px solid var(--azul);width:100%;max-width:560px;margin:auto;box-shadow:var(--shadow-md);animation:mIn .2s ease}
@@ -243,21 +198,31 @@ body{font-family:'Source Sans 3','Segoe UI',sans-serif;background:var(--cinza1);
 .modal-date{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--azul);text-transform:uppercase;margin-bottom:4px}
 .modal-title{font-size:17px;font-weight:700;color:var(--azul-esc)}
 .modal-body{padding:20px 24px 24px}
- 
-/* ── SELETOR DE TURNO ── */
+
 .turno-selector{display:flex;gap:12px;margin-bottom:20px}
 .turno-btn{flex:1;padding:14px 10px;border-radius:6px;border:2px solid var(--cinza2);background:var(--branco);cursor:pointer;text-align:center;transition:all .18s;font-family:'Source Sans 3',sans-serif}
 .turno-btn:hover:not(.bloqueado){border-color:var(--azul);background:var(--azul-bg)}
 .turno-btn.selecionado{border-color:var(--azul);background:var(--azul-bg)}
 .turno-btn.bloqueado{opacity:.45;cursor:not-allowed;background:var(--cinza1)}
+.turno-btn.meu-turno{border-color:var(--verde)!important;background:var(--verde-claro)!important;cursor:pointer!important;opacity:1!important}
 .tb-icon{font-size:22px;margin-bottom:4px}
 .tb-nome{font-size:14px;font-weight:700;color:var(--azul-esc)}
 .tb-hora{font-size:11px;color:var(--cinza5);margin-top:2px}
 .tb-status{font-size:11px;font-weight:700;margin-top:4px;min-height:14px}
 .turno-btn.bloqueado   .tb-status{color:var(--red)}
 .turno-btn.selecionado .tb-status{color:var(--verde)}
- 
-/* ── AVISOS / FORM ── */
+.turno-btn.meu-turno   .tb-status{color:var(--verde)}
+
+/* PAINEL MEU AGENDAMENTO */
+.meu-agendamento-box{background:var(--verde-claro);border:1px solid var(--verde);border-radius:6px;padding:16px 18px;margin-bottom:16px}
+.meu-agendamento-title{font-size:12px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.meu-agendamento-info{font-size:13px;color:#0a5c15;line-height:1.7}
+.meu-agendamento-info b{font-weight:700}
+.btn-cancelar{margin-top:12px;width:100%;padding:9px;border-radius:4px;background:var(--red-bg);border:1px solid var(--red);color:var(--red);font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-cancelar:hover{background:var(--red);color:#fff}
+.btn-reagendar{margin-top:8px;width:100%;padding:9px;border-radius:4px;background:var(--azul-bg);border:1px solid var(--azul);color:var(--azul);font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-reagendar:hover{background:var(--azul);color:#fff}
+
 .aviso{border-left:4px solid;border-radius:0 4px 4px 0;padding:10px 14px;margin-bottom:16px;font-size:13px;line-height:1.5}
 .aviso-amarelo{background:var(--amarelo-bg);border-color:var(--amarelo);color:#5a4800}
 .aviso b{font-weight:700}
@@ -285,8 +250,7 @@ textarea{resize:vertical;min-height:80px}
 .divisor{border:none;border-top:1px solid var(--cinza2);margin:18px 0}
 .sec-label{font-size:12px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .sec-label::after{content:'';flex:1;height:1px;background:var(--azul-claro)}
- 
-/* ── BOTÕES ── */
+
 .btn-row{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--cinza2)}
 .btn-cancel{padding:10px 20px;border-radius:4px;background:var(--branco);border:1px solid var(--cinza3);color:var(--cinza5);font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
 .btn-cancel:hover{background:var(--cinza2)}
@@ -296,8 +260,7 @@ textarea{resize:vertical;min-height:80px}
 .spinner{display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 .spinner.show{display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
- 
-/* ── SUCESSO ── */
+
 .sucesso-box{padding:28px 24px;text-align:center}
 .sucesso-icon{width:56px;height:56px;background:var(--verde-claro);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
 .sucesso-icon svg{width:28px;height:28px}
@@ -307,141 +270,91 @@ textarea{resize:vertical;min-height:80px}
 .sucesso-msg b{font-weight:700}
 .btn-fechar{padding:10px 32px;border-radius:4px;background:var(--azul);border:none;color:#fff;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
 .btn-fechar:hover{background:var(--azul-esc)}
- 
-/* ── TOAST ── */
+
+/* CANCELAMENTO SUCESSO */
+.cancelado-box{padding:28px 24px;text-align:center}
+.cancelado-icon{width:56px;height:56px;background:#fff0f0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px}
+.cancelado-title{font-size:18px;font-weight:700;color:var(--red);margin-bottom:8px}
+.cancelado-msg{font-size:14px;color:var(--cinza5);margin-bottom:20px;line-height:1.5}
+
 .toast{display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:200;padding:12px 24px;border-radius:4px;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;white-space:nowrap;box-shadow:var(--shadow-md);border-left:4px solid}
 .toast.show{display:block}
 .toast.ok{background:var(--verde-claro);border-color:var(--verde);color:#0a5c15}
 .toast.err{background:var(--red-bg);border-color:var(--red);color:var(--red)}
- 
+
+/* ══════════════════════════════════════════
+   SEÇÃO SUGESTÕES DE AULAS
+══════════════════════════════════════════ */
+.sugestoes-card{background:var(--branco);border:1px solid var(--cinza2);border-top:3px solid var(--verde);border-radius:4px;padding:28px;box-shadow:var(--shadow);margin-bottom:24px}
+.sugestoes-card .card-title::before{background:var(--verde)}
+.sugestoes-card .card-title{color:#0a5c15}
+
+/* tabs de ano */
+.ano-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.ano-tab{padding:8px 18px;border-radius:20px;border:2px solid var(--cinza2);background:var(--branco);color:var(--cinza5);font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s}
+.ano-tab:hover{border-color:var(--verde);color:var(--verde)}
+.ano-tab.ativo{background:var(--verde);border-color:var(--verde);color:#fff}
+
+/* tabs de matéria */
+.materia-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.materia-tab{padding:6px 14px;border-radius:16px;border:1px solid var(--cinza2);background:var(--cinza1);color:var(--cinza5);font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.materia-tab:hover{border-color:var(--azul);color:var(--azul)}
+.materia-tab.ativo{border-color:var(--azul);background:var(--azul);color:#fff}
+
+/* grid de sites */
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.site-card{border:1px solid var(--cinza2);border-radius:6px;overflow:hidden;transition:box-shadow .15s,transform .15s;background:var(--branco)}
+.site-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.site-card-top{padding:14px 16px 10px;border-bottom:1px solid var(--cinza2)}
+.site-materia-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.site-nome{font-size:14px;font-weight:700;color:var(--azul-esc);margin-bottom:2px}
+.site-url{font-size:11px;color:var(--cinza4)}
+.site-card-body{padding:10px 16px 14px}
+.site-desc{font-size:13px;color:var(--cinza5);line-height:1.5;margin-bottom:12px}
+.site-link{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:4px;background:var(--azul);color:#fff;font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:700;text-decoration:none;transition:background .15s}
+.site-link:hover{background:var(--azul-esc)}
+.site-link-icon{font-size:14px}
+
+/* cores por matéria */
+.tag-port{background:#E8F4FD;color:#1a5276}
+.tag-mat{background:#EAF2FF;color:#1351b4}
+.tag-cie{background:#E3F5E1;color:#168821}
+.tag-his{background:#FFF8DC;color:#7d6608}
+.tag-geo{background:#FFF3E0;color:#e07800}
+.tag-art{background:#FCE4EC;color:#c2185b}
+.tag-ef{background:#F3E5F5;color:#7b1fa2}
+.tag-ing{background:#E0F7FA;color:#00838f}
+
+.ano-descricao{font-size:13px;color:var(--cinza5);margin-bottom:18px;padding:10px 14px;background:var(--cinza1);border-radius:4px;border-left:3px solid var(--verde)}
+
+/* ── LOGIN OVERLAY ── */
+#login-overlay{position:fixed;inset:0;background:#0C326F;display:flex;align-items:center;justify-content:center;z-index:999}
+.login-box{background:#fff;padding:30px;border-radius:6px;width:100%;max-width:350px;box-shadow:var(--shadow-md)}
+.login-box h2{color:#0C326F;margin-bottom:20px;font-size:20px}
+.login-box input{width:100%;margin-top:15px;padding:10px;border:1px solid var(--cinza3);border-radius:4px;font-family:'Source Sans 3',sans-serif;font-size:14px}
+.login-box input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(19,81,180,.12)}
+.login-box button{width:100%;margin-top:15px;padding:10px;background:#1351B4;color:#fff;border:none;border-radius:4px;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.login-box button:hover{background:#0C326F}
+.login-box .erro{color:var(--red);margin-top:10px;display:none;font-size:13px;font-weight:600}
+.login-box .sucesso{color:var(--verde);margin-top:10px;display:none;font-size:13px;font-weight:600;text-align:center}
+.login-abas{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--cinza2)}
+.aba-btn{flex:1;padding:12px;background:transparent;border:none;border-bottom:3px solid transparent;color:var(--cinza5);font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.aba-btn:hover{color:var(--azul)}
+.aba-btn.aba-ativa{color:var(--azul);border-bottom-color:var(--azul)}
+
+#main-content{display:none}
+
 .rodape{background:var(--azul-esc);color:rgba(255,255,255,.6);text-align:center;font-size:12px;padding:16px;margin-top:40px}
 .rodape strong{color:rgba(255,255,255,.9)}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--cinza3);border-radius:4px}
 
-/* ── LOGIN OVERLAY ── */
-#login-overlay{
-  position:fixed;
-  inset:0;
-  background:#0C326F;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-}
-.login-box{
-  background:#fff;
-  padding:30px;
-  border-radius:6px;
-  width:100%;
-  max-width:350px;
-  box-shadow:var(--shadow-md);
-}
-.login-box h2{
-  color:#0C326F;
-  margin-bottom:20px;
-  font-size:20px;
-}
-.login-box input{
-  width:100%;
-  margin-top:15px;
-  padding:10px;
-  border:1px solid var(--cinza3);
-  border-radius:4px;
-  font-family:'Source Sans 3',sans-serif;
-  font-size:14px;
-}
-.login-box input:focus{
-  outline:none;
-  border-color:var(--azul);
-  box-shadow:0 0 0 3px rgba(19,81,180,.12);
-}
-.login-box button{
-  width:100%;
-  margin-top:15px;
-  padding:10px;
-  background:#1351B4;
-  color:#fff;
-  border:none;
-  border-radius:4px;
-  font-family:'Source Sans 3',sans-serif;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  transition:background .15s;
-}
-.login-box button:hover{
-  background:#0C326F;
-}
-.login-box .erro{
-  color:var(--red);
-  margin-top:10px;
-  display:none;
-  font-size:13px;
-  font-weight:600;
-}
-.login-box .sucesso{
-  color:var(--verde);
-  margin-top:10px;
-  display:none;
-  font-size:13px;
-  font-weight:600;
-  text-align:center;
-}
-
-/* ── ABAS ── */
-.login-abas{
-  display:flex;
-  gap:0;
-  margin-bottom:20px;
-  border-bottom:2px solid var(--cinza2);
-}
-.aba-btn{
-  flex:1;
-  padding:12px;
-  background:transparent;
-  border:none;
-  border-bottom:3px solid transparent;
-  color:var(--cinza5);
-  font-family:'Source Sans 3',sans-serif;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  transition:all .15s;
-}
-.aba-btn:hover{
-  color:var(--azul);
-}
-.aba-btn.aba-ativa{
-  color:var(--azul);
-  border-bottom-color:var(--azul);
-}
-
-#main-content{
-  display:none;
-}
-
-/* Ajuste para inputs do cadastro */
-.login-box input[type="text"]{
-  width:100%;
-  margin-top:15px;
-  padding:10px;
-  border:1px solid var(--cinza3);
-  border-radius:4px;
-  font-family:'Source Sans 3',sans-serif;
-  font-size:14px;
-}
-.login-box input[type="text"]:focus{
-  outline:none;
-  border-color:var(--azul);
-  box-shadow:0 0 0 3px rgba(19,81,180,.12);
-}
- 
 @media(max-width:500px){
   .form-row,.hw-grid{grid-template-columns:1fr}
-  .card{padding:16px}
+  .card,.sugestoes-card{padding:16px}
   .modal-body,.modal-header{padding:16px}
   .radio-group,.turno-selector{flex-direction:column}
+  .sites-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -450,21 +363,16 @@ textarea{resize:vertical;min-height:80px}
 <div id="login-overlay">
   <div class="login-box">
     <h2>Sistema de Agendamento</h2>
-    
     <div class="login-abas">
       <button class="aba-btn aba-ativa" id="aba-login" onclick="trocarAba('login')">Login</button>
       <button class="aba-btn" id="aba-cadastro" onclick="trocarAba('cadastro')">Criar Conta</button>
     </div>
-
-    <!-- FORMULÁRIO DE LOGIN -->
     <div id="login-form">
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-senha" placeholder="Senha">
       <button onclick="login()">Entrar</button>
       <div id="login-erro" class="erro"></div>
     </div>
-
-    <!-- FORMULÁRIO DE CADASTRO -->
     <div id="cadastro-form" style="display:none">
       <input type="text" id="cadastro-nome" placeholder="Seu nome">
       <input type="email" id="cadastro-email" placeholder="Email">
@@ -472,9 +380,7 @@ textarea{resize:vertical;min-height:80px}
       <input type="password" id="cadastro-senha-confirm" placeholder="Confirmar senha">
       <button onclick="cadastro()">Criar Conta</button>
       <div id="cadastro-erro" class="erro"></div>
-      <div id="cadastro-sucesso" class="sucesso" style="display:none">
-        ✓ Conta criada com sucesso!<br>Redirecionando...
-      </div>
+      <div id="cadastro-sucesso" class="sucesso" style="display:none">✓ Conta criada com sucesso!<br>Redirecionando...</div>
     </div>
   </div>
 </div>
@@ -484,7 +390,7 @@ textarea{resize:vertical;min-height:80px}
   <div class="gov-top-inner">
     <div class="brasao">BR</div>
     <div class="gov-top-text">
-      <div class="org">EM PROFESSOR EZEQUIAS SILVA VIEIRA </div>
+      <div class="org">EM PROFESSOR EZEQUIAS SILVA VIEIRA</div>
       <div class="nome">Açailândia — MA</div>
     </div>
   </div>
@@ -498,6 +404,7 @@ textarea{resize:vertical;min-height:80px}
 </div>
  
 <div class="main">
+  <!-- CALENDÁRIO -->
   <div class="card">
     <div class="card-title">Calendário de disponibilidade</div>
     <div class="cal-nav">
@@ -510,15 +417,35 @@ textarea{resize:vertical;min-height:80px}
       <div class="leg"><div class="leg-box" style="background:var(--branco);border-color:var(--cinza2)"></div>Livre</div>
       <div class="leg"><div class="leg-box" style="background:var(--laranja-bg);border-color:var(--laranja)"></div>1 turno ocupado</div>
       <div class="leg"><div class="leg-box" style="background:var(--red-bg);border-color:#ffb3b3"></div>Totalmente ocupado</div>
+      <div class="leg"><div class="leg-box" style="background:var(--verde-claro);border-color:var(--verde)"></div>Meu agendamento</div>
       <div class="leg"><div class="leg-box" style="background:var(--azul-bg);border-color:var(--azul)"></div>Hoje</div>
     </div>
   </div>
+
+  <!-- SUGESTÕES DE AULAS -->
+  <div class="sugestoes-card">
+    <div class="card-title">💡 Sugestões de Sites para Aulas — Ensino Fundamental I</div>
+
+    <div class="ano-tabs" id="ano-tabs">
+      <button class="ano-tab ativo" onclick="selecionarAno(1,this)">1º Ano</button>
+      <button class="ano-tab" onclick="selecionarAno(2,this)">2º Ano</button>
+      <button class="ano-tab" onclick="selecionarAno(3,this)">3º Ano</button>
+      <button class="ano-tab" onclick="selecionarAno(4,this)">4º Ano</button>
+      <button class="ano-tab" onclick="selecionarAno(5,this)">5º Ano</button>
+    </div>
+
+    <div class="ano-descricao" id="ano-descricao"></div>
+
+    <div class="materia-tabs" id="materia-tabs"></div>
+
+    <div class="sites-grid" id="sites-grid"></div>
+  </div>
 </div>
- 
-<!-- OVERLAY -->
+
+<!-- OVERLAY / MODAL -->
 <div class="overlay" id="overlay">
 <div class="modal" id="modal">
- 
+
   <!-- VIEW: FORMULÁRIO -->
   <div id="view-form">
     <div class="modal-header">
@@ -526,93 +453,104 @@ textarea{resize:vertical;min-height:80px}
       <div class="modal-title">Formulário de Agendamento</div>
     </div>
     <div class="modal-body">
- 
       <div class="sec-label">Selecione o turno</div>
       <div class="turno-selector">
-        <div class="turno-btn" id="btn-turno-manha" onclick="selecionarTurno('manha')">
-          <div class="tb-icon">&#127749;</div>
+        <div class="turno-btn" id="btn-turno-manha" onclick="handleTurnoClick('manha')">
+          <div class="tb-icon">🌅</div>
           <div class="tb-nome">Manhã</div>
           <div class="tb-hora">07:30 – 11:30</div>
           <div class="tb-status" id="status-manha"></div>
         </div>
-        <div class="turno-btn" id="btn-turno-tarde" onclick="selecionarTurno('tarde')">
-          <div class="tb-icon">&#127748;</div>
+        <div class="turno-btn" id="btn-turno-tarde" onclick="handleTurnoClick('tarde')">
+          <div class="tb-icon">🌤️</div>
           <div class="tb-nome">Tarde</div>
           <div class="tb-hora">13:30 – 17:30</div>
           <div class="tb-status" id="status-tarde"></div>
         </div>
       </div>
- 
-      <div class="aviso aviso-amarelo">
-        Preencha todos os campos obrigatórios (*). Após confirmar, o turno será bloqueado para todos os usuários.
+
+      <!-- painel do meu agendamento (aparece quando o turno é meu) -->
+      <div class="meu-agendamento-box" id="meu-agendamento-box" style="display:none">
+        <div class="meu-agendamento-title">✅ Este turno foi agendado por você</div>
+        <div class="meu-agendamento-info" id="meu-agendamento-info"></div>
+        <button class="btn-cancelar" onclick="cancelarMeuTurno()">🗑️ Cancelar este agendamento</button>
+        <button class="btn-reagendar" onclick="reagendarTurno()">🔄 Reagendar para outro dia/turno</button>
       </div>
- 
-      <div class="sec-label">Dados do solicitante</div>
-      <div class="form-section">
-        <label class="fl">Primeiro nome <span class="req">*</span></label>
-        <input type="text" id="f-nome" placeholder="Primeiro nome do professor ou responsável">
-      </div>
-      <div class="form-section">
-        <label class="fl">Turma / Turno <span class="req">*</span></label>
-        <input type="text" id="f-turma" placeholder="Ex: 9A — Manhã">
-      </div>
- 
-      <hr class="divisor">
-      <div class="sec-label">Dados do agendamento</div>
-      <div class="form-section">
-        <label class="fl">Horário <span class="req">*</span> <span id="horario-hint" style="font-size:11px;color:var(--cinza4);text-transform:none;letter-spacing:0;font-weight:400"></span></label>
-        <div class="form-row">
-          <select id="f-inicio"><option value="">Selecione o turno primeiro</option></select>
-          <select id="f-fim"><option value="">Selecione o turno primeiro</option></select>
+
+      <!-- formulário (só aparece quando turno livre está selecionado) -->
+      <div id="form-agendamento">
+        <div class="aviso aviso-amarelo">
+          Preencha todos os campos obrigatórios (*). Após confirmar, o turno será bloqueado para todos os usuários.
+        </div>
+        <div class="sec-label">Dados do solicitante</div>
+        <div class="form-section">
+          <label class="fl">Primeiro nome <span class="req">*</span></label>
+          <input type="text" id="f-nome" placeholder="Primeiro nome do professor ou responsável">
+        </div>
+        <div class="form-section">
+          <label class="fl">Turma / Turno <span class="req">*</span></label>
+          <input type="text" id="f-turma" placeholder="Ex: 9A — Manhã">
+        </div>
+        <hr class="divisor">
+        <div class="sec-label">Dados do agendamento</div>
+        <div class="form-section">
+          <label class="fl">Horário <span class="req">*</span> <span id="horario-hint" style="font-size:11px;color:var(--cinza4);text-transform:none;letter-spacing:0;font-weight:400"></span></label>
+          <div class="form-row">
+            <select id="f-inicio"><option value="">Selecione o turno primeiro</option></select>
+            <select id="f-fim"><option value="">Selecione o turno primeiro</option></select>
+          </div>
+        </div>
+        <div class="form-section">
+          <label class="fl">Disciplina / atividade <span class="req">*</span></label>
+          <input type="text" id="f-atividade" placeholder="Ex: Aula de informática básica, pesquisa escolar...">
+        </div>
+        <hr class="divisor">
+        <div class="sec-label">Configuração técnica</div>
+        <div class="hw-info">
+          <div class="hw-title">Configuração padrão das máquinas</div>
+          <div class="hw-grid">
+            <div class="hw-item">Windows 10 (padrão)</div>
+            <div class="hw-item">4 GB de RAM</div>
+          </div>
+        </div>
+        <div class="aviso aviso-amarelo" style="margin-bottom:16px">
+          <b>Atenção:</b> Configuração modesta (4 GB RAM). Programas pesados podem não funcionar adequadamente.
+        </div>
+        <div class="form-section">
+          <label class="fl">Software necessário</label>
+          <input type="text" id="f-software" placeholder="Ex: LibreOffice, Chrome, VS Code...">
+        </div>
+        <div class="form-section">
+          <label class="fl">Precisa de suporte técnico no dia? <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-opt sel-nao" id="opt-nao" onclick="selectAux('nao')">
+              <input type="radio" name="aux" value="nao" checked> Não, consigo sozinho
+            </label>
+            <label class="radio-opt" id="opt-sim" onclick="selectAux('sim')">
+              <input type="radio" name="aux" value="sim"> Sim, preciso de auxílio
+            </label>
+          </div>
+          <div class="aux-box" id="aux-box">
+            <label class="fl" style="margin-top:10px">Descreva o suporte necessário <span class="req">*</span></label>
+            <textarea id="f-auxilio" placeholder="Descreva detalhadamente o suporte técnico que precisa..."></textarea>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+          <button class="btn-send" id="btn-send" onclick="enviar()">
+            <span id="btn-text">Confirmar agendamento</span>
+            <span class="spinner" id="spinner"></span>
+          </button>
         </div>
       </div>
-      <div class="form-section">
-        <label class="fl">Disciplina / atividade <span class="req">*</span></label>
-        <input type="text" id="f-atividade" placeholder="Ex: Aula de informática básica, pesquisa escolar...">
-      </div>
- 
-      <hr class="divisor">
-      <div class="sec-label">Configuração técnica</div>
-      <div class="hw-info">
-        <div class="hw-title">Configuração padrão das máquinas</div>
-        <div class="hw-grid">
-          <div class="hw-item">Windows 10 (padrão)</div>
-          <div class="hw-item">4 GB de RAM</div>
-        </div>
-      </div>
-      <div class="aviso aviso-amarelo" style="margin-bottom:16px">
-        <b>Atenção:</b> Configuração modesta (4 GB RAM). Programas pesados podem não funcionar adequadamente. Informe o software abaixo para verificação prévia.
-      </div>
-      <div class="form-section">
-        <label class="fl">Software necessário</label>
-        <input type="text" id="f-software" placeholder="Ex: LibreOffice, Chrome, VS Code...">
-      </div>
-      <div class="form-section">
-        <label class="fl">Precisa de suporte técnico no dia? <span class="req">*</span></label>
-        <div class="radio-group">
-          <label class="radio-opt sel-nao" id="opt-nao" onclick="selectAux('nao')">
-            <input type="radio" name="aux" value="nao" checked> Não, consigo sozinho
-          </label>
-          <label class="radio-opt" id="opt-sim" onclick="selectAux('sim')">
-            <input type="radio" name="aux" value="sim"> Sim, preciso de auxílio
-          </label>
-        </div>
-        <div class="aux-box" id="aux-box">
-          <label class="fl" style="margin-top:10px">Descreva o suporte necessário <span class="req">*</span></label>
-          <textarea id="f-auxilio" placeholder="Descreva detalhadamente o suporte técnico que precisa..."></textarea>
-        </div>
-      </div>
- 
-      <div class="btn-row">
-        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-        <button class="btn-send" id="btn-send" onclick="enviar()">
-          <span id="btn-text">Confirmar agendamento</span>
-          <span class="spinner" id="spinner"></span>
-        </button>
+
+      <!-- botão fechar quando só mostra meu agendamento -->
+      <div id="btn-fechar-apenas" style="display:none;margin-top:16px">
+        <button class="btn-cancel" style="width:100%" onclick="closeModal()">Fechar</button>
       </div>
     </div>
   </div>
- 
+
   <!-- VIEW: SUCESSO -->
   <div id="view-sucesso" style="display:none">
     <div class="sucesso-box">
@@ -631,341 +569,684 @@ textarea{resize:vertical;min-height:80px}
       <button class="btn-fechar" onclick="fecharSucesso()">Fechar</button>
     </div>
   </div>
- 
+
+  <!-- VIEW: CANCELAMENTO -->
+  <div id="view-cancelado" style="display:none">
+    <div class="cancelado-box">
+      <div class="cancelado-icon">🗑️</div>
+      <div class="cancelado-title">Agendamento cancelado</div>
+      <div class="cancelado-msg" id="cancelado-msg"></div>
+      <button class="btn-fechar" style="background:var(--cinza5)" onclick="fecharSucesso()">Fechar</button>
+    </div>
+  </div>
+
 </div>
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <div class="rodape">
   <strong>EM PROFESSOR EZEQUIAS SILVA VIEIRA</strong><br>
   Sistema de Agendamento do Laboratório de Informática
 </div>
 </div>
- 
+
 <script>
+/* ── EMAILJS ── */
+const EMAILJS_PUBLIC_KEY  = "a4BwIFXWQYqd2AX1_";
+const EMAILJS_SERVICE_ID  = "service_pw6lpc2";
+const EMAILJS_TEMPLATE_ID = "template_g202p74";
+const EMAIL_DESTINO       = "kawakarlyndoalves@gmail.com";
+emailjs.init(EMAILJS_PUBLIC_KEY);
 
-  /* ── EMAILJS ── */
-  
-  const EMAILJS_PUBLIC_KEY  = "a4BwIFXWQYqd2AX1_";
-  const EMAILJS_SERVICE_ID  = "service_pw6lpc2";
-  const EMAILJS_TEMPLATE_ID = "template_g202p74";
-  const EMAIL_DESTINO       = "kawakarlyndoalves@gmail.com";
-  emailjs.init(EMAILJS_PUBLIC_KEY);
-  
-  /* ── HORÁRIOS POR TURNO ── */
-  const HORARIOS = {
-    manha: {
-      inicio: ["07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00"],
-      fim:    ["08:00","08:30","09:00","09:30","10:00","10:30","11:00","11:30"]
-    },
-    tarde: {
-      inicio: ["13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00"],
-      fim:    ["14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00"]
+/* ── HORÁRIOS ── */
+const HORARIOS = {
+  manha: { inicio: ["07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00"], fim: ["08:00","08:30","09:00","09:30","10:00","10:30","11:00","11:30"] },
+  tarde: { inicio: ["13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00"], fim: ["14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00"] }
+};
+
+/* ── ESTADO ── */
+const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const DIAS  = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+let hoje             = new Date();
+let curYear          = hoje.getFullYear();
+let curMonth         = hoje.getMonth();
+let selectedDate     = null;
+let turnoSelecionado = null;
+let turnoMeuSelecionado = null; // turno que é do usuário atual
+let auxSelecionado   = "nao";
+let dadosDia         = { manha: null, tarde: null };
+
+/* ── FIREBASE ── */
+function aguardarFb() {
+  return new Promise(res => {
+    if (window._fbReady) { res(); return; }
+    document.addEventListener("firebase-ready", res, { once: true });
+  });
+}
+async function lerDia(dateStr) {
+  await aguardarFb();
+  try {
+    const snap = await window._fbGet("agendamentos/" + dateStr);
+    return snap.exists() ? snap.val() : { manha: null, tarde: null };
+  } catch(e) { return { manha: null, tarde: null }; }
+}
+async function lerMes(year, month) {
+  await aguardarFb();
+  const prefix = `${year}-${String(month+1).padStart(2,"0")}`;
+  const result = {};
+  try {
+    const snap = await window._fbGet("agendamentos");
+    if (snap.exists()) {
+      Object.entries(snap.val()).forEach(([k,v]) => {
+        if (k.startsWith(prefix)) result[k] = v;
+      });
     }
-  };
-  
-  /* ── ESTADO GLOBAL ── */
-  const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-                "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-  const DIAS  = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-  let hoje             = new Date();
-  let curYear          = hoje.getFullYear();
-  let curMonth         = hoje.getMonth();
-  let selectedDate     = null;
-  let turnoSelecionado = null;
-  let auxSelecionado   = "nao";
-  let dadosDia         = { manha: null, tarde: null };
-  
-  /* ── FIREBASE (aguarda módulo ES carregar) ── */
-  function aguardarFb() {
-    return new Promise(res => {
-      if (window._fbReady) { res(); return; }
-      document.addEventListener("firebase-ready", res, { once: true });
-    });
+  } catch(e) {}
+  return result;
+}
+async function salvarTurno(dateStr, turno, dados) {
+  await aguardarFb();
+  await window._fbUpdate("agendamentos/" + dateStr, { [turno]: dados });
+}
+async function removerTurno(dateStr, turno) {
+  await aguardarFb();
+  await window._fbUpdate("agendamentos/" + dateStr, { [turno]: null });
+}
+
+/* ── HELPER: verifica se o turno pertence ao usuário logado ── */
+function ehMeuTurno(turnoData) {
+  if (!turnoData || !window._currentUserEmail) return false;
+  return turnoData.emailUsuario === window._currentUserEmail;
+}
+
+/* ── CALENDÁRIO ── */
+async function renderCal() {
+  document.getElementById("cal-title").textContent = MESES[curMonth] + " de " + curYear;
+  document.getElementById("cal-area").innerHTML = '<div class="cal-loading">Carregando...</div>';
+
+  const mesDados    = await lerMes(curYear, curMonth);
+  const firstDay    = new Date(curYear, curMonth, 1).getDay();
+  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
+
+  const grid = document.createElement("div");
+  grid.className = "cal-grid";
+
+  DIAS.forEach(d => {
+    const el = document.createElement("div");
+    el.className = "day-hdr"; el.textContent = d; grid.appendChild(el);
+  });
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement("div"); el.className = "day empty"; grid.appendChild(el);
   }
-  async function lerDia(dateStr) {
-    await aguardarFb();
-    try {
-      const snap = await window._fbGet("agendamentos/" + dateStr);
-      return snap.exists() ? snap.val() : { manha: null, tarde: null };
-    } catch(e) { return { manha: null, tarde: null }; }
-  }
-  async function lerMes(year, month) {
-    await aguardarFb();
-    const prefix = `${year}-${String(month+1).padStart(2,"0")}`;
-    const result = {};
-    try {
-      const snap = await window._fbGet("agendamentos");
-      if (snap.exists()) {
-        Object.entries(snap.val()).forEach(([k,v]) => {
-          if (k.startsWith(prefix)) result[k] = v;
-        });
-      }
-    } catch(e) {}
-    return result;
-  }
-  async function salvarTurno(dateStr, turno, dados) {
-    await aguardarFb();
-    /* update parcial: só altera o turno escolhido, o outro permanece intacto */
-    await window._fbUpdate("agendamentos/" + dateStr, { [turno]: dados });
-  }
-  
-  /* ── CALENDÁRIO ── */
-  async function renderCal() {
-    document.getElementById("cal-title").textContent = MESES[curMonth] + " de " + curYear;
-    document.getElementById("cal-area").innerHTML = '<div class="cal-loading">Carregando...</div>';
-  
-    const mesDados    = await lerMes(curYear, curMonth);
-    const firstDay    = new Date(curYear, curMonth, 1).getDay();
-    const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
-  
-    const grid = document.createElement("div");
-    grid.className = "cal-grid";
-  
-    DIAS.forEach(d => {
-      const el = document.createElement("div");
-      el.className = "day-hdr"; el.textContent = d; grid.appendChild(el);
-    });
-    for (let i = 0; i < firstDay; i++) {
-      const el = document.createElement("div"); el.className = "day empty"; grid.appendChild(el);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${curYear}-${String(curMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const cell    = new Date(curYear, curMonth, d);
+    const td      = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const isPast  = cell < td;
+    const isToday = cell.getTime() === td.getTime();
+    const info    = mesDados[dateStr] || { manha: null, tarde: null };
+    const temM    = !!info.manha;
+    const temT    = !!info.tarde;
+    const meuM    = ehMeuTurno(info.manha);
+    const meuT    = ehMeuTurno(info.tarde);
+    const cheio   = temM && temT && !meuM && !meuT;
+    const meuDia  = meuM || meuT;
+    const meio    = (temM || temT) && !cheio && !meuDia;
+
+    const el = document.createElement("div");
+    el.className = "day";
+    if (isToday) el.classList.add("today");
+    if (isPast)  el.classList.add("past");
+    else if (meuDia) { el.classList.add("meu-dia"); if (!temM || !temT) el.classList.add("meio"); }
+    else if (cheio)  el.classList.add("cheio");
+    else if (meio)   el.classList.add("meio");
+    else             el.classList.add("livre");
+
+    const classeM = meuM ? " meu" : (temM ? " ocup" : "");
+    const classeT = meuT ? " meu" : (temT ? " ocup" : "");
+    el.innerHTML =
+      `<div class="faixa-m${classeM}"></div>` +
+      `<div class="faixa-t${classeT}"></div>` +
+      `<div class="day-num">${d}</div>`;
+
+    if (!isPast && (meio || cheio || meuDia)) {
+      const dotM = meuM ? "meu" : (temM ? "ocup" : "livre");
+      const dotT = meuT ? "meu" : (temT ? "ocup" : "livre");
+      el.innerHTML += `<div class="turnos-badge"><div class="dot ${dotM}"></div><div class="dot ${dotT}"></div></div>`;
     }
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dateStr = `${curYear}-${String(curMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-      const cell    = new Date(curYear, curMonth, d);
-      const td      = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-      const isPast  = cell < td;
-      const isToday = cell.getTime() === td.getTime();
-      const info    = mesDados[dateStr] || { manha: null, tarde: null };
-      const temM    = !!info.manha;
-      const temT    = !!info.tarde;
-      const cheio   = temM && temT;
-      const meio    = (temM || temT) && !cheio;
-  
-      const el = document.createElement("div");
-      el.className = "day";
-      if (isToday)      el.classList.add("today");
-      if (isPast)       el.classList.add("past");
-      else if (cheio)   el.classList.add("cheio");
-      else if (meio)    el.classList.add("meio");
-      else              el.classList.add("livre");
-  
-      /* faixas de cor — metade superior = manhã, inferior = tarde */
-      el.innerHTML =
-        `<div class="faixa-m${temM ? " ocup" : ""}"></div>` +
-        `<div class="faixa-t${temT ? " ocup" : ""}"></div>` +
-        `<div class="day-num">${d}</div>`;
-  
-      /* dots apenas se meio ou cheio */
-      if (!isPast && (meio || cheio)) {
-        el.innerHTML +=
-          `<div class="turnos-badge">` +
-          `<div class="dot ${temM ? 'ocup' : 'livre'}"></div>` +
-          `<div class="dot ${temT ? 'ocup' : 'livre'}"></div>` +
-          `</div>`;
-      }
-  
-      if (!isPast && !cheio) el.onclick = () => openModal(dateStr, info);
-      grid.appendChild(el);
-    }
-  
-    document.getElementById("cal-area").innerHTML = "";
-    document.getElementById("cal-area").appendChild(grid);
+
+    if (!isPast && (!cheio || meuDia)) el.onclick = () => openModal(dateStr, info);
+    grid.appendChild(el);
   }
-  
-  function navMonth(dir) {
-    curMonth += dir;
-    if (curMonth > 11) { curMonth = 0; curYear++; }
-    if (curMonth < 0)  { curMonth = 11; curYear--; }
+
+  document.getElementById("cal-area").innerHTML = "";
+  document.getElementById("cal-area").appendChild(grid);
+}
+
+function navMonth(dir) {
+  curMonth += dir;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth < 0)  { curMonth = 11; curYear--; }
+  renderCal();
+}
+
+/* ── MODAL ── */
+function openModal(dateStr, info) {
+  selectedDate     = dateStr;
+  dadosDia         = info || { manha: null, tarde: null };
+  turnoSelecionado = null;
+  turnoMeuSelecionado = null;
+
+  const [y, m, d] = dateStr.split("-");
+  document.getElementById("modal-date").textContent =
+    DIAS[new Date(+y,+m-1,+d).getDay()] + ", " + +d + " de " + MESES[+m-1] + " de " + y;
+
+  atualizarBotoesTurno();
+
+  // pré-seleciona se só um livre
+  const meuM = ehMeuTurno(dadosDia.manha);
+  const meuT = ehMeuTurno(dadosDia.tarde);
+  if (!dadosDia.manha && dadosDia.tarde && !meuT)  selecionarTurno("manha");
+  else if (dadosDia.manha && !meuM && !dadosDia.tarde) selecionarTurno("tarde");
+  else if (meuM) mostrarMeuTurno("manha");
+  else if (meuT) mostrarMeuTurno("tarde");
+  else limparHorarios();
+
+  document.getElementById("view-form").style.display    = "block";
+  document.getElementById("view-sucesso").style.display = "none";
+  document.getElementById("view-cancelado").style.display = "none";
+  document.getElementById("overlay").classList.add("show");
+}
+
+function atualizarBotoesTurno() {
+  const temM = !!dadosDia.manha;
+  const temT = !!dadosDia.tarde;
+  const meuM = ehMeuTurno(dadosDia.manha);
+  const meuT = ehMeuTurno(dadosDia.tarde);
+
+  const bM = document.getElementById("btn-turno-manha");
+  const bT = document.getElementById("btn-turno-tarde");
+
+  bM.className = "turno-btn" + (meuM ? " meu-turno" : (temM ? " bloqueado" : ""));
+  bT.className = "turno-btn" + (meuT ? " meu-turno" : (temT ? " bloqueado" : ""));
+
+  document.getElementById("status-manha").textContent = meuM ? "Meu agendamento" : (temM ? "Ocupado" : "Disponível");
+  document.getElementById("status-tarde").textContent = meuT ? "Meu agendamento" : (temT ? "Ocupado" : "Disponível");
+}
+
+function handleTurnoClick(turno) {
+  const dados = dadosDia[turno];
+  if (ehMeuTurno(dados)) {
+    mostrarMeuTurno(turno);
+  } else if (!dados) {
+    selecionarTurno(turno);
+  }
+  // se é de outro usuário, não faz nada (bloqueado)
+}
+
+function mostrarMeuTurno(turno) {
+  turnoMeuSelecionado = turno;
+  turnoSelecionado = null;
+
+  // destaque no botão
+  const bM = document.getElementById("btn-turno-manha");
+  const bT = document.getElementById("btn-turno-tarde");
+  const meuM = ehMeuTurno(dadosDia.manha);
+  const meuT = ehMeuTurno(dadosDia.tarde);
+  bM.className = "turno-btn" + (meuM ? " meu-turno" : (dadosDia.manha ? " bloqueado" : "")) + (turno==="manha" && meuM ? " selecionado" : "");
+  bT.className = "turno-btn" + (meuT ? " meu-turno" : (dadosDia.tarde ? " bloqueado" : "")) + (turno==="tarde" && meuT ? " selecionado" : "");
+
+  const dados = dadosDia[turno];
+  document.getElementById("meu-agendamento-info").innerHTML =
+    `<b>Turno:</b> ${turno === "manha" ? "Manhã" : "Tarde"}<br>` +
+    `<b>Horário:</b> ${dados.inicio} – ${dados.fim}<br>` +
+    `<b>Turma:</b> ${dados.turma}<br>` +
+    `<b>Atividade:</b> ${dados.atividade}<br>` +
+    `<b>Software:</b> ${dados.software || "Não especificado"}`;
+
+  document.getElementById("meu-agendamento-box").style.display = "block";
+  document.getElementById("form-agendamento").style.display = "none";
+  document.getElementById("btn-fechar-apenas").style.display = "block";
+  limparHorarios();
+}
+
+function selecionarTurno(turno) {
+  if (dadosDia[turno] && !ehMeuTurno(dadosDia[turno])) return;
+
+  turnoSelecionado = turno;
+  turnoMeuSelecionado = null;
+
+  document.getElementById("meu-agendamento-box").style.display = "none";
+  document.getElementById("form-agendamento").style.display = "block";
+  document.getElementById("btn-fechar-apenas").style.display = "none";
+
+  const bM = document.getElementById("btn-turno-manha");
+  const bT = document.getElementById("btn-turno-tarde");
+  const meuM = ehMeuTurno(dadosDia.manha);
+  const meuT = ehMeuTurno(dadosDia.tarde);
+  if (!dadosDia.manha || meuM) bM.className = "turno-btn" + (turno === "manha" ? " selecionado" : (meuM ? " meu-turno" : ""));
+  if (!dadosDia.tarde || meuT) bT.className = "turno-btn" + (turno === "tarde" ? " selecionado" : (meuT ? " meu-turno" : ""));
+
+  document.getElementById("status-manha").textContent = dadosDia.manha && !meuM ? "Ocupado" : (turno === "manha" ? "Selecionado" : "Disponível");
+  document.getElementById("status-tarde").textContent = dadosDia.tarde && !meuT ? "Ocupado" : (turno === "tarde" ? "Selecionado" : "Disponível");
+
+  preencherHorarios(turno);
+  document.getElementById("horario-hint").textContent = turno === "manha" ? "(somente horários da manhã)" : "(somente horários da tarde)";
+}
+
+function preencherHorarios(turno) {
+  const ini = document.getElementById("f-inicio");
+  const fim = document.getElementById("f-fim");
+  ini.innerHTML = '<option value="">Horário de início</option>';
+  fim.innerHTML = '<option value="">Horário de término</option>';
+  HORARIOS[turno].inicio.forEach(h => ini.innerHTML += `<option>${h}</option>`);
+  HORARIOS[turno].fim.forEach(h    => fim.innerHTML += `<option>${h}</option>`);
+}
+
+function limparHorarios() {
+  ["f-inicio","f-fim"].forEach(id => {
+    document.getElementById(id).innerHTML = '<option value="">Selecione o turno primeiro</option>';
+  });
+  document.getElementById("horario-hint").textContent = "";
+}
+
+function closeModal() {
+  document.getElementById("overlay").classList.remove("show");
+  document.getElementById("aux-box").classList.remove("show");
+  document.getElementById("meu-agendamento-box").style.display = "none";
+  document.getElementById("form-agendamento").style.display = "block";
+  document.getElementById("btn-fechar-apenas").style.display = "none";
+  selectAux("nao");
+  turnoSelecionado = null;
+  turnoMeuSelecionado = null;
+  ["f-nome","f-turma","f-atividade","f-software","f-auxilio"].forEach(id => document.getElementById(id).value = "");
+  limparHorarios();
+}
+
+function fecharSucesso() { document.getElementById("overlay").classList.remove("show"); }
+
+function selectAux(val) {
+  auxSelecionado = val;
+  document.querySelectorAll("input[name=aux]").forEach(r => r.checked = r.value === val);
+  document.getElementById("opt-sim").className = "radio-opt" + (val==="sim" ? " sel-sim" : "");
+  document.getElementById("opt-nao").className = "radio-opt" + (val==="nao" ? " sel-nao" : "");
+  document.getElementById("aux-box").classList.toggle("show", val === "sim");
+}
+
+function showToast(msg, isErr) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show " + (isErr ? "err" : "ok");
+  setTimeout(() => t.className = "toast", 5000);
+}
+
+function setLoading(on) {
+  document.getElementById("btn-text").style.display = on ? "none" : "inline";
+  document.getElementById("spinner").classList.toggle("show", on);
+  document.getElementById("btn-send").disabled = on;
+}
+
+/* ── CANCELAR MEU TURNO ── */
+async function cancelarMeuTurno() {
+  if (!turnoMeuSelecionado) return;
+  if (!confirm("Tem certeza que deseja cancelar este agendamento?")) return;
+
+  const [y, m, d] = selectedDate.split("-");
+  const dataFmt = +d + " de " + MESES[+m-1] + " de " + y;
+  const turnoLabel = turnoMeuSelecionado === "manha" ? "Manhã" : "Tarde";
+
+  try {
+    await removerTurno(selectedDate, turnoMeuSelecionado);
+    document.getElementById("view-form").style.display = "none";
+    document.getElementById("view-cancelado").style.display = "block";
+    document.getElementById("cancelado-msg").textContent =
+      `Seu agendamento de ${turnoLabel} — ${dataFmt} foi cancelado com sucesso. O horário está disponível novamente.`;
     renderCal();
+  } catch(e) {
+    showToast("Erro ao cancelar. Verifique a conexão.", true);
   }
-  
-  /* ── MODAL ── */
-  function openModal(dateStr, info) {
-    selectedDate     = dateStr;
-    dadosDia         = info || { manha: null, tarde: null };
-    turnoSelecionado = null;
-  
-    const [y, m, d] = dateStr.split("-");
-    document.getElementById("modal-date").textContent =
-      DIAS[new Date(+y,+m-1,+d).getDay()] + ", " + +d + " de " + MESES[+m-1] + " de " + y;
-  
+}
+
+/* ── REAGENDAR ── */
+function reagendarTurno() {
+  // fecha modal e orienta o usuário
+  closeModal();
+  showToast("Selecione um novo dia/turno no calendário para reagendar.", false);
+}
+
+/* ── ENVIAR NOVO AGENDAMENTO ── */
+async function enviar() {
+  if (!turnoSelecionado) { showToast("Selecione um turno (Manhã ou Tarde).", true); return; }
+
+  const nome      = document.getElementById("f-nome").value.trim();
+  const turma     = document.getElementById("f-turma").value.trim();
+  const inicio    = document.getElementById("f-inicio").value;
+  const fim       = document.getElementById("f-fim").value;
+  const atividade = document.getElementById("f-atividade").value.trim();
+  const software  = document.getElementById("f-software").value.trim();
+  const auxTexto  = document.getElementById("f-auxilio").value.trim();
+
+  if (!nome || !turma || !inicio || !fim || !atividade) { showToast("Preencha todos os campos obrigatórios (*).", true); return; }
+  if (auxSelecionado === "sim" && !auxTexto) { showToast("Descreva o suporte técnico necessário.", true); return; }
+
+  const atual = await lerDia(selectedDate);
+  if (atual[turnoSelecionado] && !ehMeuTurno(atual[turnoSelecionado])) {
+    showToast("Este turno acabou de ser reservado. Escolha outro.", true);
+    dadosDia = atual;
     atualizarBotoesTurno();
-  
-    /* pré-seleciona automaticamente se só um turno estiver livre */
-    if (!dadosDia.manha && dadosDia.tarde)  selecionarTurno("manha");
-    else if (dadosDia.manha && !dadosDia.tarde) selecionarTurno("tarde");
-    else limparHorarios();
-  
-    document.getElementById("view-form").style.display    = "block";
-    document.getElementById("view-sucesso").style.display = "none";
-    document.getElementById("overlay").classList.add("show");
-  }
-  
-  function atualizarBotoesTurno() {
-    const temM = !!dadosDia.manha;
-    const temT = !!dadosDia.tarde;
-    const bM = document.getElementById("btn-turno-manha");
-    const bT = document.getElementById("btn-turno-tarde");
-    bM.className = "turno-btn" + (temM ? " bloqueado" : "");
-    bT.className = "turno-btn" + (temT ? " bloqueado" : "");
-    document.getElementById("status-manha").textContent = temM ? "Ocupado" : "Disponível";
-    document.getElementById("status-tarde").textContent = temT ? "Ocupado" : "Disponível";
-  }
-  
-  function selecionarTurno(turno) {
-    if ((turno === "manha" && dadosDia.manha) ||
-        (turno === "tarde" && dadosDia.tarde)) return;
-  
-    turnoSelecionado = turno;
-  
-    const bM = document.getElementById("btn-turno-manha");
-    const bT = document.getElementById("btn-turno-tarde");
-    if (!dadosDia.manha) bM.className = "turno-btn" + (turno === "manha" ? " selecionado" : "");
-    if (!dadosDia.tarde) bT.className = "turno-btn" + (turno === "tarde" ? " selecionado" : "");
-    document.getElementById("status-manha").textContent =
-      dadosDia.manha ? "Ocupado" : (turno === "manha" ? "Selecionado" : "Disponível");
-    document.getElementById("status-tarde").textContent =
-      dadosDia.tarde ? "Ocupado" : (turno === "tarde" ? "Selecionado" : "Disponível");
-  
-    preencherHorarios(turno);
-    document.getElementById("horario-hint").textContent =
-      turno === "manha" ? "(somente horários da manhã)" : "(somente horários da tarde)";
-  }
-  
-  function preencherHorarios(turno) {
-    const ini = document.getElementById("f-inicio");
-    const fim = document.getElementById("f-fim");
-    ini.innerHTML = '<option value="">Horário de início</option>';
-    fim.innerHTML = '<option value="">Horário de término</option>';
-    HORARIOS[turno].inicio.forEach(h => ini.innerHTML += `<option>${h}</option>`);
-    HORARIOS[turno].fim.forEach(h    => fim.innerHTML += `<option>${h}</option>`);
-  }
-  
-  function limparHorarios() {
-    ["f-inicio","f-fim"].forEach(id => {
-      document.getElementById(id).innerHTML = '<option value="">Selecione o turno primeiro</option>';
-    });
-    document.getElementById("horario-hint").textContent = "";
-  }
-  
-  function closeModal() {
-    document.getElementById("overlay").classList.remove("show");
-    document.getElementById("aux-box").classList.remove("show");
-    selectAux("nao");
     turnoSelecionado = null;
-    ["f-nome","f-turma","f-atividade","f-software","f-auxilio"]
-      .forEach(id => document.getElementById(id).value = "");
     limparHorarios();
+    return;
   }
-  
-  function fecharSucesso() { document.getElementById("overlay").classList.remove("show"); }
-  
-  function selectAux(val) {
-    auxSelecionado = val;
-    document.querySelectorAll("input[name=aux]").forEach(r => r.checked = r.value === val);
-    document.getElementById("opt-sim").className = "radio-opt" + (val==="sim" ? " sel-sim" : "");
-    document.getElementById("opt-nao").className = "radio-opt" + (val==="nao" ? " sel-nao" : "");
-    document.getElementById("aux-box").classList.toggle("show", val === "sim");
-  }
-  
-  function showToast(msg, isErr) {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.className = "toast show " + (isErr ? "err" : "ok");
-    setTimeout(() => t.className = "toast", 5000);
-  }
-  
-  function setLoading(on) {
-    document.getElementById("btn-text").style.display = on ? "none" : "inline";
-    document.getElementById("spinner").classList.toggle("show", on);
-    document.getElementById("btn-send").disabled = on;
-  }
-  
-  /* ── ENVIAR ── */
-  async function enviar() {
-    if (!turnoSelecionado) { showToast("Selecione um turno (Manhã ou Tarde).", true); return; }
-  
-    const nome      = document.getElementById("f-nome").value.trim();
-    const turma     = document.getElementById("f-turma").value.trim();
-    const inicio    = document.getElementById("f-inicio").value;
-    const fim       = document.getElementById("f-fim").value;
-    const atividade = document.getElementById("f-atividade").value.trim();
-    const software  = document.getElementById("f-software").value.trim();
-    const auxTexto  = document.getElementById("f-auxilio").value.trim();
-  
-    if (!nome || !turma || !inicio || !fim || !atividade) {
-      showToast("Preencha todos os campos obrigatórios (*).", true); return;
-    }
-    if (auxSelecionado === "sim" && !auxTexto) {
-      showToast("Descreva o suporte técnico necessário.", true); return;
-    }
-  
-    /* verificação de corrida: relê o Firebase antes de salvar */
-    const atual = await lerDia(selectedDate);
-    if (atual[turnoSelecionado]) {
-      showToast("Este turno acabou de ser reservado. Escolha outro.", true);
-      dadosDia = atual;
-      atualizarBotoesTurno();
-      turnoSelecionado = null;
-      limparHorarios();
-      return;
-    }
-  
-    const [y, m, d]     = selectedDate.split("-");
-    const dataFormatada = +d + " de " + MESES[+m-1] + " de " + y;
-    const turnoLabel    = turnoSelecionado === "manha" ? "Manhã" : "Tarde";
-  
-    const dadosAgendamento = {
-      nome, turma, inicio, fim, atividade,
-      software: software || "Não especificado",
-      suporte: auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não",
-      registradoEm: new Date().toISOString()
-    };
-  
-    const emailParams = {
-      to_email: EMAIL_DESTINO,
-      data: dataFormatada, turno: turnoLabel,
-      nome, turma,
-      horario: inicio + " – " + fim,
-      atividade,
-      software: software || "Não especificado",
-      suporte: auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não"
-    };
-  
-    setLoading(true);
-    try {
-      await salvarTurno(selectedDate, turnoSelecionado, dadosAgendamento);
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams)
-        .catch(e => console.warn("EmailJS:", e));
-      setLoading(false);
-      document.getElementById("view-form").style.display    = "none";
-      document.getElementById("view-sucesso").style.display = "block";
-      document.getElementById("sucesso-data").textContent   = turnoLabel + " · " + dataFormatada;
-      renderCal();
-    } catch(e) {
-      showToast("Erro ao salvar. Verifique a conexão.", true);
-      setLoading(false);
-    }
-  }
-  
-  document.getElementById("overlay").addEventListener("click", function(e) {
-    if (e.target === this) closeModal();
-  });
 
-  /* Permitir Enter no login */
-  document.getElementById("login-email").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") login();
-  });
-  document.getElementById("login-senha").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") login();
-  });
-  document.getElementById("cadastro-senha-confirm").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") cadastro();
-  });
-  
-  aguardarFb().then(() => renderCal());
+  const [y, m, d]     = selectedDate.split("-");
+  const dataFormatada = +d + " de " + MESES[+m-1] + " de " + y;
+  const turnoLabel    = turnoSelecionado === "manha" ? "Manhã" : "Tarde";
 
+  const dadosAgendamento = {
+    nome, turma, inicio, fim, atividade,
+    software: software || "Não especificado",
+    suporte: auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não",
+    emailUsuario: window._currentUserEmail || "",
+    registradoEm: new Date().toISOString()
+  };
+
+  const emailParams = {
+    to_email: EMAIL_DESTINO,
+    data: dataFormatada, turno: turnoLabel,
+    nome, turma,
+    horario: inicio + " – " + fim,
+    atividade,
+    software: software || "Não especificado",
+    suporte: auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não"
+  };
+
+  setLoading(true);
+  try {
+    await salvarTurno(selectedDate, turnoSelecionado, dadosAgendamento);
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams).catch(e => console.warn("EmailJS:", e));
+    setLoading(false);
+    document.getElementById("view-form").style.display    = "none";
+    document.getElementById("view-sucesso").style.display = "block";
+    document.getElementById("sucesso-data").textContent   = turnoLabel + " · " + dataFormatada;
+    renderCal();
+  } catch(e) {
+    showToast("Erro ao salvar. Verifique a conexão.", true);
+    setLoading(false);
+  }
+}
+
+document.getElementById("overlay").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
+document.getElementById("login-email").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
+document.getElementById("login-senha").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
+document.getElementById("cadastro-senha-confirm").addEventListener("keypress", e => { if (e.key === "Enter") cadastro(); });
+
+aguardarFb().then(() => renderCal());
+
+/* ══════════════════════════════════════════════════════
+   SUGESTÕES DE AULAS — DADOS
+══════════════════════════════════════════════════════ */
+
+const ANOS_INFO = {
+  1: "Foco em alfabetização e letramento. Os alunos aprendem a reconhecer letras, sílabas, números e noções básicas de convivência.",
+  2: "Consolidação da leitura e escrita. Introdução a operações matemáticas simples, noções de natureza e sociedade.",
+  3: "Ampliação da leitura com textos mais elaborados, multiplicação e divisão, início de ciências naturais mais detalhado.",
+  4: "Leitura crítica, frações, história e geografia do Brasil, corpo humano e ecossistemas.",
+  5: "Síntese do Ensino Fundamental I: textos dissertativos, porcentagem, história e geografia ampliadas, ciências e tecnologia."
+};
+
+const SITES = {
+  1: {
+    "Português": [
+      { nome:"Escola Games – Alfabeto", url:"https://www.escolagames.com.br", desc:"Jogos interativos de reconhecimento de letras, formação de sílabas e palavras. Ideal para iniciantes na alfabetização.", tag:"port" },
+      { nome:"Atividades ABC", url:"https://www.atividadesabc.com.br", desc:"Fichas e atividades digitais de alfabetização com letras maiúsculas e minúsculas, traçado e reconhecimento.", tag:"port" },
+      { nome:"Canção Nova Kids – Histórias", url:"https://kids.cancaonova.com", desc:"Histórias infantis em vídeo e texto que estimulam a oralidade, o vocabulário e o prazer pela leitura.", tag:"port" },
+    ],
+    "Matemática": [
+      { nome:"Tabuada.net", url:"https://www.tabuada.net", desc:"Exercícios lúdicos de contagem, sequências numéricas e operações básicas para o 1º ano.", tag:"mat" },
+      { nome:"Math Kids (Jogos)", url:"https://www.mathplayground.com", desc:"Jogos em inglês com interface visual. Excelente para associar números a quantidades de forma concreta.", tag:"mat" },
+      { nome:"Portal Educação – Matemática 1º ano", url:"https://www.portaleducacao.com.br", desc:"Material de apoio com atividades impressas e interativas de números até 100, formas geométricas e medidas.", tag:"mat" },
+    ],
+    "Ciências": [
+      { nome:"Ciências na Escola", url:"https://cienciasnaeducacaobasica.blogspot.com", desc:"Vídeos e atividades sobre o corpo humano, animais e plantas adaptados para crianças em fase de alfabetização.", tag:"cie" },
+      { nome:"TV Escola – Ciências", url:"https://tvescola.org.br", desc:"Vídeos educativos do MEC sobre natureza, animais e o meio ambiente voltados ao Ensino Fundamental I.", tag:"cie" },
+    ],
+    "História": [
+      { nome:"Historinha.com.br", url:"https://www.historinha.com.br", desc:"Histórias e atividades sobre família, comunidade e convivência. Perfeito para introduzir noções de história pessoal.", tag:"his" },
+    ],
+    "Geografia": [
+      { nome:"Mundo Educação – Geografia Inf.", url:"https://mundoeducacao.uol.com.br/geografia", desc:"Textos simples sobre bairro, município e localização. Indicado para primeiros contatos com orientação espacial.", tag:"geo" },
+    ],
+    "Arte": [
+      { nome:"Arte na Escola", url:"https://artenaeducacao.br", desc:"Atividades de desenho, pintura e percepção estética para crianças do 1º ao 5º ano.", tag:"art" },
+      { nome:"Tate Kids", url:"https://www.tate.org.uk/kids", desc:"Site do museu Tate (UK) com jogos de arte e criatividade. Interface visual e intuitiva para crianças.", tag:"art" },
+    ],
+    "Ed. Física": [
+      { nome:"Nova Escola – Ed. Física", url:"https://novaescola.org.br/educacao-fisica", desc:"Sequências didáticas de jogos e brincadeiras para desenvolver lateralidade, coordenação e socialização.", tag:"ef" },
+    ],
+  },
+  2: {
+    "Português": [
+      { nome:"Rá-Tim-Bum – Leitura", url:"https://www.ratimbum.com.br", desc:"Portal com jogos de formação de palavras, leitura de frases e produção de textos curtos.", tag:"port" },
+      { nome:"Ler Brincando", url:"https://www.lerbrincando.com.br", desc:"Atividades interativas de leitura e interpretação de texto para o 2º ano, com histórias ilustradas.", tag:"port" },
+      { nome:"Palavras Cruzadas Online – Inf.", url:"https://www.aprendabrincando.net.br", desc:"Caça-palavras e cruzadinhas temáticas que reforçam ortografia e vocabulário.", tag:"port" },
+    ],
+    "Matemática": [
+      { nome:"Khan Academy Kids", url:"https://pt.khanacademy.org", desc:"Exercícios de adição, subtração e resolução de problemas simples com feedback imediato e trilha de aprendizagem.", tag:"mat" },
+      { nome:"Coolmath Games", url:"https://www.coolmathgames.com", desc:"Jogos matemáticos visuais para fixar operações básicas e raciocínio lógico.", tag:"mat" },
+      { nome:"Geração Matemática", url:"https://www.geracaomatematica.com.br", desc:"Vídeoaulas e atividades impressas com situações-problema do cotidiano do 2º ano.", tag:"mat" },
+    ],
+    "Ciências": [
+      { nome:"Mundo dos Animais", url:"https://mundodosanimais.com.br", desc:"Informações e imagens sobre animais, habitats e alimentação. Excelente para aulas de classificação dos animais.", tag:"cie" },
+      { nome:"Só Ciências", url:"https://www.sobiologia.com.br", desc:"Conteúdos sobre seres vivos, ciclo da água e estados da matéria com linguagem acessível para o 2º ano.", tag:"cie" },
+    ],
+    "História": [
+      { nome:"Historinha.com.br", url:"https://www.historinha.com.br", desc:"Atividades sobre o passado da família, datas comemorativas e tradições culturais brasileiras.", tag:"his" },
+      { nome:"Nova Escola – História Inf.", url:"https://novaescola.org.br/historia", desc:"Sequências didáticas com linha do tempo pessoal, fotografias e memórias para o 2º ano.", tag:"his" },
+    ],
+    "Geografia": [
+      { nome:"IBGE Kids", url:"https://educa.ibge.gov.br/jovens", desc:"Portal do IBGE para crianças com dados do Brasil, mapas ilustrados e curiosidades sobre regiões.", tag:"geo" },
+    ],
+    "Arte": [
+      { nome:"Arte Fácil", url:"https://www.artefacil.net.br", desc:"Tutoriais de desenho passo a passo e atividades de colagem e pintura para turmas do 2º ano.", tag:"art" },
+    ],
+    "Ed. Física": [
+      { nome:"Atividades de Ed. Física", url:"https://www.educacaofisica.com.br", desc:"Banco de jogos e brincadeiras cooperativas para desenvolver habilidades motoras no 2º ano.", tag:"ef" },
+    ],
+    "Inglês": [
+      { nome:"British Council Kids", url:"https://learnenglishkids.britishcouncil.org", desc:"Jogos, músicas e histórias em inglês para iniciantes. Ótimo para primeiro contato com o idioma.", tag:"ing" },
+    ],
+  },
+  3: {
+    "Português": [
+      { nome:"Releituras – Textos", url:"https://www.releituras.com", desc:"Acervo de textos literários e informativos com atividades de interpretação para o 3º ano.", tag:"port" },
+      { nome:"Só Língua Portuguesa", url:"https://www.solinguaportuguesa.com.br", desc:"Exercícios de gramática, ortografia e produção textual com correção automática.", tag:"port" },
+      { nome:"Leituras do Brasil", url:"https://www.leiturasbrasil.com.br", desc:"Contos, fábulas e poemas brasileiros com propostas de leitura e interpretação.", tag:"port" },
+    ],
+    "Matemática": [
+      { nome:"Khan Academy – 3º ano", url:"https://pt.khanacademy.org", desc:"Módulo completo com multiplicação, divisão, frações iniciais e geometria plana com videoaulas.", tag:"mat" },
+      { nome:"Matemática Rio", url:"https://www.matematicario.com.br", desc:"Videoaulas claras sobre tabuada, multiplicação e resolução de problemas com exemplos práticos.", tag:"mat" },
+      { nome:"Calculators.org – Kids", url:"https://www.calculators.org", desc:"Ferramentas interativas para praticar multiplicação e divisão com feedback visual.", tag:"mat" },
+    ],
+    "Ciências": [
+      { nome:"Ciência Hoje das Crianças", url:"https://chc.org.br", desc:"Revista digital com artigos científicos adaptados para crianças sobre ecologia, corpo humano e tecnologia.", tag:"cie" },
+      { nome:"National Geographic Kids BR", url:"https://natgeoescolabrasil.com", desc:"Conteúdos sobre animais, meio ambiente e ciências com fotos e vídeos impressionantes.", tag:"cie" },
+    ],
+    "História": [
+      { nome:"Brasil Escola – História", url:"https://brasilescola.uol.com.br/historia-do-brasil", desc:"Textos sobre história local, colonização e costumes brasileiros adaptados para o Ensino Fundamental I.", tag:"his" },
+      { nome:"Museu Nacional Digital", url:"https://museunacional.ufrj.br", desc:"Acervo virtual com artefatos históricos e conteúdo sobre povos originários do Brasil.", tag:"his" },
+    ],
+    "Geografia": [
+      { nome:"IBGE Kids – Mapas", url:"https://educa.ibge.gov.br/jovens/conheca-o-brasil/territorio", desc:"Mapas do Brasil com regiões, estados e capitais. Ótimo para introduzir orientação geográfica.", tag:"geo" },
+      { nome:"Só Geografia", url:"https://www.sogeografia.com.br", desc:"Conteúdos sobre relevo, clima e regiões do Brasil com linguagem acessível.", tag:"geo" },
+    ],
+    "Arte": [
+      { nome:"Smarthistory", url:"https://smarthistory.org", desc:"Acervo visual de obras de arte com explicações acessíveis. Ótimo para apreciação estética.", tag:"art" },
+      { nome:"Google Arts & Culture", url:"https://artsandculture.google.com", desc:"Visitas virtuais a museus do mundo inteiro. Excelente para conhecer diferentes formas de arte.", tag:"art" },
+    ],
+    "Ed. Física": [
+      { nome:"Jogos Cooperativos", url:"https://www.jogoscooperativos.com.br", desc:"Banco com mais de 200 jogos e brincadeiras que desenvolvem cooperação, respeito e habilidades motoras.", tag:"ef" },
+    ],
+    "Inglês": [
+      { nome:"Duolingo for Schools", url:"https://schools.duolingo.com", desc:"Plataforma gratuita de inglês com gamificação. Professores podem acompanhar o progresso da turma.", tag:"ing" },
+    ],
+  },
+  4: {
+    "Português": [
+      { nome:"Língua Portuguesa – Nova Escola", url:"https://novaescola.org.br/lingua-portuguesa", desc:"Sequências didáticas completas com gêneros textuais variados, produção e reescrita para o 4º ano.", tag:"port" },
+      { nome:"Gramática Online", url:"https://www.gramatica.net.br", desc:"Exercícios de análise morfológica, pontuação e ortografia com gabarito automático.", tag:"port" },
+      { nome:"EBC – Agência Brasil Notícias", url:"https://agenciabrasil.ebc.com.br", desc:"Notícias reais para trabalhar leitura de textos informativos e jornalísticos na sala de aula.", tag:"port" },
+    ],
+    "Matemática": [
+      { nome:"Khan Academy – 4º ano", url:"https://pt.khanacademy.org", desc:"Módulo de frações, números decimais, ângulos e área. Trilha de aprendizagem personalizada.", tag:"mat" },
+      { nome:"Mathway", url:"https://www.mathway.com/pt", desc:"Resolve operações passo a passo. Útil para demonstrar procedimentos de cálculo no projetor.", tag:"mat" },
+      { nome:"Smartick", url:"https://www.smartick.com.br", desc:"Plataforma adaptativa de matemática com exercícios diários de 15 min para 4º e 5º anos.", tag:"mat" },
+    ],
+    "Ciências": [
+      { nome:"Ciências – MEC/BNCC", url:"https://novaescola.org.br/ciencias", desc:"Planos de aula alinhados à BNCC sobre corpo humano, ecossistemas e transformações físicas e químicas.", tag:"cie" },
+      { nome:"Biodiversidade Brasileira", url:"https://www.mma.gov.br/biodiversidade", desc:"Portal do MMA com informações sobre biomas, espécies e preservação ambiental do Brasil.", tag:"cie" },
+    ],
+    "História": [
+      { nome:"Museu do Amanhã – Edu", url:"https://museudoamanha.org.br/pt-br/content/educadores", desc:"Materiais educativos sobre sustentabilidade, história humana e futuro do planeta.", tag:"his" },
+      { nome:"Fundação Palmares – Edu", url:"https://www.palmares.gov.br", desc:"Conteúdos sobre cultura afro-brasileira, quilombos e história da população negra no Brasil.", tag:"his" },
+    ],
+    "Geografia": [
+      { nome:"ArcGIS Online – Edu", url:"https://www.arcgis.com/index.html", desc:"Ferramenta de mapas interativos gratuita para uso educacional. Ótima para visualizar regiões geográficas.", tag:"geo" },
+      { nome:"Só Geografia – Regiões BR", url:"https://www.sogeografia.com.br/Conteudos/GeografiaFisica", desc:"Conteúdos sobre regiões brasileiras, estados, capitais e características naturais.", tag:"geo" },
+    ],
+    "Arte": [
+      { nome:"Fundação Bienal", url:"https://www.bienal.org.br", desc:"Acervo de arte contemporânea brasileira e internacional. Ótimo para apreciação e análise de obras.", tag:"art" },
+      { nome:"Arte e Educação – SESC", url:"https://www.sescsp.org.br/arte-e-educacao", desc:"Recursos educativos de arte com foco em cultura brasileira, artesanato e expressão corporal.", tag:"art" },
+    ],
+    "Ed. Física": [
+      { nome:"SportKids Brasil", url:"https://novaescola.org.br/educacao-fisica", desc:"Planos de aula para esportes adaptados, dança e ginástica alinhados à BNCC para o 4º ano.", tag:"ef" },
+    ],
+    "Inglês": [
+      { nome:"British Council – Teens", url:"https://www.britishcouncil.org.br/aprenda-ingles/online", desc:"Recursos de inglês com vídeos, exercícios e atividades interativas para nível básico.", tag:"ing" },
+      { nome:"Fun English Games", url:"https://www.funenglishgames.com", desc:"Jogos interativos de vocabulário, gramática e pronúncia para ensino fundamental.", tag:"ing" },
+    ],
+  },
+  5: {
+    "Português": [
+      { nome:"Releituras – Clássicos", url:"https://www.releituras.com", desc:"Textos dissertativos, argumentativos e literários com atividades de interpretação para o 5º ano.", tag:"port" },
+      { nome:"Redação Online – Fund. I", url:"https://www.redacaonline.com.br", desc:"Exercícios de produção textual com estrutura de parágrafo, coerência e coesão.", tag:"port" },
+      { nome:"Lingua.com – Port.", url:"https://pt.lingua.com", desc:"Testes de português online com foco em ortografia, acentuação e gramática para concluintes do Fundamental I.", tag:"port" },
+    ],
+    "Matemática": [
+      { nome:"Khan Academy – 5º ano", url:"https://pt.khanacademy.org", desc:"Módulo de porcentagem, decimais, volumes, frações e introdução à álgebra. Trilha completa para conclusão do ciclo.", tag:"mat" },
+      { nome:"GeoGebra", url:"https://www.geogebra.org/pt", desc:"Software gratuito de matemática dinâmica para explorar geometria, gráficos e álgebra visualmente.", tag:"mat" },
+      { nome:"Matemática no Cotidiano", url:"https://www.matematicanocotidiano.com.br", desc:"Problemas contextualizados com situações do dia a dia: compras, distâncias, receitas e dados.", tag:"mat" },
+    ],
+    "Ciências": [
+      { nome:"Portal do Professor – MEC", url:"https://portaldoprofessor.mec.gov.br", desc:"Repositório de aulas multimídia sobre tecnologia, astronomia, eletricidade e ciências da vida.", tag:"cie" },
+      { nome:"Astro Kids – NASA", url:"https://spaceplace.nasa.gov/pt", desc:"Site da NASA com conteúdo sobre sistema solar, estrelas e exploração espacial adaptado para crianças.", tag:"cie" },
+      { nome:"Scientifc Kids", url:"https://www.cientistasdomanhã.com.br", desc:"Experimentos científicos simples que podem ser feitos no laboratório de informática com simulações online.", tag:"cie" },
+    ],
+    "História": [
+      { nome:"Memória da Educação – MEC", url:"https://www.memoria.mec.gov.br", desc:"Acervo histórico com documentos, fotos e vídeos sobre a história da educação e do Brasil.", tag:"his" },
+      { nome:"IBRAM – Museus Virtuais", url:"https://www.museus.gov.br/museus-virtuais", desc:"Passeios virtuais pelos principais museus brasileiros com conteúdo histórico e cultural.", tag:"his" },
+      { nome:"Toda Matéria – História BR", url:"https://www.todamateria.com.br/historia-do-brasil", desc:"Síntese da história do Brasil do descobrimento à República, com textos claros e mapas.", tag:"his" },
+    ],
+    "Geografia": [
+      { nome:"Google Earth Edu", url:"https://www.google.com/earth/education", desc:"Ferramenta de exploração geográfica em 3D. Permite visitar qualquer lugar do planeta em sala de aula.", tag:"geo" },
+      { nome:"IBGE Cidades", url:"https://cidades.ibge.gov.br", desc:"Dados sobre todos os municípios brasileiros: população, economia e características geográficas.", tag:"geo" },
+      { nome:"Toda Matéria – Geografia", url:"https://www.todamateria.com.br/geografia", desc:"Conteúdos sobre cartografia, biomas, climas e relevo do Brasil com mapas e infográficos.", tag:"geo" },
+    ],
+    "Arte": [
+      { nome:"Google Arts & Culture", url:"https://artsandculture.google.com", desc:"Explore museus do mundo inteiro em alta resolução. Perfeito para apreciação estética e análise de obras.", tag:"art" },
+      { nome:"Cultura Digital – MinC", url:"https://cultura.gov.br/cultura-digital", desc:"Portal com recursos sobre cultura brasileira, folclore, artes visuais e música popular.", tag:"art" },
+    ],
+    "Ed. Física": [
+      { nome:"Atletismo Escolar – CBAt", url:"https://www.cbat.org.br/atletismo-escolar", desc:"Programa de atletismo para escolas com videos explicativos e sequências pedagógicas.", tag:"ef" },
+      { nome:"Nova Escola – Dança e Ritmo", url:"https://novaescola.org.br/educacao-fisica/danca", desc:"Planos de aula de dança e expressão corporal alinhados à BNCC para turmas do 5º ano.", tag:"ef" },
+    ],
+    "Inglês": [
+      { nome:"Duolingo for Schools", url:"https://schools.duolingo.com", desc:"Inglês gamificado com acompanhamento de turma pelo professor. Excelente para encerrar o Fundamental I.", tag:"ing" },
+      { nome:"BBC Learning English – Kids", url:"https://www.bbc.co.uk/learningenglish", desc:"Recursos de inglês da BBC com vídeos, áudios e atividades progressivas para o nível fundamental.", tag:"ing" },
+    ],
+  }
+};
+
+const MATERIA_CORES = {
+  port:"tag-port", mat:"tag-mat", cie:"tag-cie",
+  his:"tag-his", geo:"tag-geo", art:"tag-art",
+  ef:"tag-ef", ing:"tag-ing"
+};
+
+const MATERIA_NOMES = {
+  "Português":"Português", "Matemática":"Matemática", "Ciências":"Ciências",
+  "História":"História", "Geografia":"Geografia", "Arte":"Arte",
+  "Ed. Física":"Ed. Física", "Inglês":"Inglês"
+};
+
+let anoAtual = 1;
+let materiaAtual = null;
+
+function selecionarAno(ano, btn) {
+  anoAtual = ano;
+  materiaAtual = null;
+  document.querySelectorAll(".ano-tab").forEach(t => t.classList.remove("ativo"));
+  btn.classList.add("ativo");
+  document.getElementById("ano-descricao").textContent = ANOS_INFO[ano];
+  renderMateriasTabs();
+  renderSites();
+}
+
+function renderMateriasTabs() {
+  const materias = Object.keys(SITES[anoAtual]);
+  const container = document.getElementById("materia-tabs");
+  container.innerHTML = "";
+  // botão "Todas"
+  const all = document.createElement("button");
+  all.className = "materia-tab" + (materiaAtual === null ? " ativo" : "");
+  all.textContent = "Todas as matérias";
+  all.onclick = () => { materiaAtual = null; renderMateriasTabs(); renderSites(); };
+  container.appendChild(all);
+
+  materias.forEach(mat => {
+    const btn = document.createElement("button");
+    btn.className = "materia-tab" + (materiaAtual === mat ? " ativo" : "");
+    btn.textContent = mat;
+    btn.onclick = () => { materiaAtual = mat; renderMateriasTabs(); renderSites(); };
+    container.appendChild(btn);
+  });
+}
+
+function renderSites() {
+  const grid = document.getElementById("sites-grid");
+  grid.innerHTML = "";
+  const dadosAno = SITES[anoAtual];
+  const materias = materiaAtual ? [materiaAtual] : Object.keys(dadosAno);
+
+  materias.forEach(mat => {
+    dadosAno[mat].forEach(site => {
+      const card = document.createElement("div");
+      card.className = "site-card";
+      const tagClass = MATERIA_CORES[site.tag] || "tag-port";
+      card.innerHTML = `
+        <div class="site-card-top">
+          <span class="site-materia-tag ${tagClass}">${mat}</span>
+          <div class="site-nome">${site.nome}</div>
+          <div class="site-url">${site.url}</div>
+        </div>
+        <div class="site-card-body">
+          <div class="site-desc">${site.desc}</div>
+          <a href="${site.url}" target="_blank" rel="noopener" class="site-link">
+            <span class="site-link-icon">🔗</span> Acessar site
+          </a>
+        </div>`;
+      grid.appendChild(card);
+    });
+  });
+}
+
+// Inicializa seção de sugestões
+document.getElementById("ano-descricao").textContent = ANOS_INFO[1];
+renderMateriasTabs();
+renderSites();
 </script>
 </body>
 </html>
