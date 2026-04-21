@@ -691,7 +691,7 @@ async function removerTurno(dateStr, turno) {
 /* ── HELPERS ── */
 function ehMeuTurno(turnoData) {
   if (!turnoData || !window._currentUserEmail) return false;
-  return turnoData.emailUsuario === window._currentUserEmail;
+  return turnoData.uid === window._fbGetCurrentUser()?.uid;
 }
  
 /* Retorna true se a data (Date obj) é sábado ou domingo */
@@ -1013,7 +1013,7 @@ async function enviar() {
     nome, turma, inicio, fim, atividade,
     software: software || "Não especificado",
     suporte: auxSelecionado === "sim" ? "Sim — " + auxTexto : "Não",
-    emailUsuario: window._currentUserEmail || "",
+    uid: window._fbGetCurrentUser()?.uid || "",
     registradoEm: new Date().toISOString()
   };
  
